@@ -10,6 +10,7 @@ import (
 	repository "github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-questions/respository"
 	"github.com/go-chi/chi"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type QuestionController struct {
@@ -33,8 +34,13 @@ func (qc QuestionController) CreateQuestion(w http.ResponseWriter, r *http.Reque
 
 	// Set to DB
 	result, err := qc.questionRepository.CreateQuestion(question)
+	
 	if err != nil {
-		log.Printf("Error creating question")
+		if mongo.IsDuplicateKeyError(err) {
+			http.Error(w, "A question with this title already exists", http.StatusConflict)
+			return
+        }
+		log.Fatal("Error creating question")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
