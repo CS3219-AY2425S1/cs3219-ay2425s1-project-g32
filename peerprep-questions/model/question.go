@@ -9,3 +9,10 @@ type Question struct {
 	Category    string             `json:"category"` // could maybe have category & complexity as some enum
 	Complexity  string             `json:"complexity"`
 }
+
+type UpdateQuestionRequest struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Category    string `json:"category"`
+	Complexity  string `json:"complexity"`
+}

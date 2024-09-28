@@ -2,11 +2,13 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-questions/model"
 	repository "github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-questions/respository"
+	"github.com/go-chi/chi"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -32,7 +34,7 @@ func (qc QuestionController) CreateQuestion(w http.ResponseWriter, r *http.Reque
 	// Set to DB
 	result, err := qc.questionRepository.CreateQuestion(question)
 	if err != nil {
-		log.Fatal("Error creating question")
+		log.Printf("Error creating question")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -48,7 +50,7 @@ func (qc QuestionController) ListQuestions(w http.ResponseWriter, r *http.Reques
 	// Get from DB
 	questions, err := qc.questionRepository.ListQuestions()
 	if err != nil {
-		log.Fatal("Error getting all question")
+		log.Printf("Error getting all question")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -58,46 +60,65 @@ func (qc QuestionController) ListQuestions(w http.ResponseWriter, r *http.Reques
 }
 
 func (qc QuestionController) UpdateQuestion(w http.ResponseWriter, r *http.Request) {
-	// var question model.Question
-	// if err := json.NewDecoder(r.Body).Decode(&question); err != nil {
-	// 	http.Error(w, "Invalid input", http.StatusBadRequest)
-	// 	return
-	// }
+	id := chi.URLParam(r, "id")
+	log.Printf("Updating question with id %v", id)
 
-	// // Validation
+	// parse request body into update request
+	updateRequest := model.UpdateQuestionRequest{}
+	if err := json.NewDecoder(r.Body).Decode(&updateRequest); err != nil {
+		log.Printf("Invalid input error: %v", err)
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
 
-	// // Set to DB
-
-	// w.WriteHeader(http.StatusCreated)
-	// json.NewEncoder(w).Encode(question)
+	err := qc.questionRepository.UpdateQuestion(id, updateRequest)
+	if err != nil {
+		if errors.Is(err, model.InvalidInputError{}) {
+			log.Printf("Invalid input error: %v", err)
+			http.Error(w, "Invalid input", http.StatusBadRequest)
+		} else {
+			log.Printf("Error updating question: %v", err)
+			w.WriteHeader(http.StatusNotFound)
+		}
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (qc QuestionController) DeleteQuestion(w http.ResponseWriter, r *http.Request) {
-	// var question model.Question
-	// if err := json.NewDecoder(r.Body).Decode(&question); err != nil {
-	// 	http.Error(w, "Invalid input", http.StatusBadRequest)
-	// 	return
-	// }
+	id := chi.URLParam(r, "id")
+	log.Printf("Deleting question with id %v", id)
 
-	// // Validation
-
-	// // Set to DB
-
-	// w.WriteHeader(http.StatusCreated)
-	// json.NewEncoder(w).Encode(question)
+	// Delete from DB
+	err := qc.questionRepository.DeleteQuestion(id)
+	if err != nil {
+		if errors.Is(err, model.InvalidInputError{}) {
+			log.Printf("Invalid input error: %v", err)
+			http.Error(w, "Invalid input", http.StatusBadRequest)
+		} else {
+			log.Printf("Error deleting question: %v", err)
+			w.WriteHeader(http.StatusNotFound)
+		}
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func (qc QuestionController) GetQuestion(w http.ResponseWriter, r *http.Request) {
-	// var question model.Question
-	// if err := json.NewDecoder(r.Body).Decode(&question); err != nil {
-	// 	http.Error(w, "Invalid input", http.StatusBadRequest)
-	// 	return
-	// }
+	id := chi.URLParam(r, "id")
+	log.Printf("Getting question with id %v", id)
 
-	// // Validation
-
-	// // Set to DB
-
-	// w.WriteHeader(http.StatusCreated)
-	// json.NewEncoder(w).Encode(question)
+	question, err := qc.questionRepository.GetQuestion(id)
+	if err != nil {
+		if errors.Is(err, model.InvalidInputError{}) {
+			log.Printf("Invalid input error: %v", err)
+			http.Error(w, "Invalid input", http.StatusBadRequest)
+		} else {
+			log.Printf("Error getting question: %v", err)
+			w.WriteHeader(http.StatusNotFound)
+		}
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(question)
 }
