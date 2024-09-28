@@ -40,7 +40,7 @@ func (qc QuestionController) CreateQuestion(w http.ResponseWriter, r *http.Reque
 			http.Error(w, "A question with this title already exists", http.StatusConflict)
 			return
         }
-		log.Fatal("Error creating question")
+		log.Printf("Error creating question")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
