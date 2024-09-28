@@ -3,13 +3,13 @@ import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import { cn } from '@/utils/tailwind';
 import Toaster from '@/components/ui/toast/toaster';
+import Header from '@/components/header';
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
 });
 
-const Header = () => <></>;
 const Footer = () => <></>;
 
 export default function App({ Component, pageProps }: AppProps) {
