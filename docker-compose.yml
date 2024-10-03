@@ -1,0 +1,13 @@
+version: '3'
+services:
+  peerprep-questions:
+    build: ./peerprep-questions # Path to your peerprep-questions Dockerfile
+    ports:
+      - "3001:3001"
+    depends_on:
+      - peerprep-users
+
+  peerprep-users:
+    build: ./peerprep-users # Path to your peerprep-users Dockerfile
+    ports:
+      - "3002:3002"

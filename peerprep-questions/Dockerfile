@@ -10,4 +10,4 @@ COPY . .
 CMD ["go", "run", "main.go"]
 
 # Expose the port 3000 to the outside world
-EXPOSE 3000
+EXPOSE 3001

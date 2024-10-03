@@ -35,6 +35,6 @@ func main() {
 		r.Delete("/{id}", questionController.DeleteQuestion)
 		r.Get("/{id}", questionController.GetQuestion)
 	})
-	log.Println("Running on port 3000")
-	http.ListenAndServe(":3000", r)
+	log.Println("Running on port 3001")
+	http.ListenAndServe(":3001", r)
 }
