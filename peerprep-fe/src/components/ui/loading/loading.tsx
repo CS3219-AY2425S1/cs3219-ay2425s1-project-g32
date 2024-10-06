@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 
-import { cn } from "@/utils/tailwind";
+import { cn } from '@/utils/tailwind';
 
 const Loading = React.forwardRef<
   HTMLDivElement,
@@ -11,7 +11,7 @@ const Loading = React.forwardRef<
       <svg
         aria-hidden="true"
         className={cn(
-          "mr-2 h-8 w-8 animate-spin fill-blue-600 text-gray-200 dark:text-gray-600",
+          'mr-2 h-8 w-8 animate-spin fill-blue-600 text-gray-200 dark:text-gray-600',
           props.svg
         )}
         viewBox="0 0 100 101"

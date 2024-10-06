@@ -1,8 +1,10 @@
 'use client';
+
+import { useEffect, useLayoutEffect, useState } from 'react';
+
 import { Badge } from '@/components/ui/badge';
 import Skeleton from '@/components/ui/skeleton';
 import {
-  TableCaption,
   TableHeader,
   TableRow,
   TableHead,
@@ -11,9 +13,8 @@ import {
   TableCell,
 } from '@/components/ui/table';
 import { useToast } from '@/components/ui/toast/use-toast';
-import { Question } from '@/types/question';
+import { type Question } from '@/types/question';
 import { api } from '@/utils/api';
-import { useEffect, useLayoutEffect, useState } from 'react';
 
 const Difficulty = ({ difficulty }: { difficulty: string }) => {
   let className = '';
@@ -26,6 +27,8 @@ const Difficulty = ({ difficulty }: { difficulty: string }) => {
       break;
     case 'Hard':
       className = 'text-red-600';
+      break;
+    default:
       break;
   }
   return <div className={className}>{difficulty}</div>;
@@ -46,7 +49,7 @@ export default function QuestionsPage() {
       try {
         setLoading(true);
         const data = await api<Question[]>(
-          `${process.env.NEXT_PUBLIC_QUESTIONS_BACKEND_URL}/question`
+          `${process.env.NEXT_PUBLIC_QUESTIONS_BACKEND_URL || ''}/question`
         );
         console.log(data[0].description);
         setQuestions(data);

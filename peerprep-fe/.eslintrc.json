@@ -1,4 +1,21 @@
 {
+  "overrides": [
+    {
+      "extends": ["plugin:@typescript-eslint/recommended-requiring-type-checking"],
+      "files": ["*.ts", "*.tsx"],
+      "parserOptions": {
+        "project": "tsconfig.json"
+      },
+      "rules": {
+        "@typescript-eslint/no-floating-promises": "off"
+      }
+    }
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint"],
   "extends": [
     "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended",
@@ -13,10 +30,7 @@
         "fixStyle": "inline-type-imports"
       }
     ],
-    "@typescript-eslint/no-unused-vars": [
-      "warn",
-      { "argsIgnorePattern": "^_" }
-    ],
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "import/extensions": [
       "error",
       "ignorePackages",
@@ -55,10 +69,7 @@
         ]
       }
     ],
-    "react/jsx-filename-extension": [
-      2,
-      { "extensions": [".js", ".jsx", ".ts", ".tsx"] }
-    ], // Allow for jsx in typescript files
+    "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }], // Allow for jsx in typescript files
     "react/function-component-definition": [
       // Allow for arrow-functions
       2,

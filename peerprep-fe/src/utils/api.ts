@@ -1,3 +1,4 @@
+/* eslint-disable-next-line import/prefer-default-export */
 export async function api<T>(path: string): Promise<T> {
   const response = await fetch(path);
 

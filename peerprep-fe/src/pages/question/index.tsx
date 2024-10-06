@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { Form, useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
 
 const FormSchema = z.object({
   codeInput: z.string().min(1, 'Input your answer.'),
 });
 
 export default function QuestionAnswerPage() {
-  const [codeInput, setCodeInput] = useState('');
+  /* eslint-disable-next-line no-unused-vars */
+  const [_, setCodeInput] = useState('');
   const [activeTab, setActiveTab] = useState('testCases'); // State to handle tab switching
 
   const question = {
@@ -73,34 +74,37 @@ export default function QuestionAnswerPage() {
         </div>
         {/* Submit Button */}
         <div className="mb-4 flex justify-end">
-          <div
+          <button
+            type="button"
             onClick={onSubmit}
             className="cursor-pointer rounded bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600"
           >
             Run Code
-          </div>
+          </button>
         </div>
 
         {/* Test Cases and Test Results Section */}
         <div className="h-1/2 rounded bg-gray-50 p-4">
           {/* Tabs */}
           <div className="mb-2 flex">
-            <div
+            <button
+              type="button"
               onClick={() => setActiveTab('testCases')}
               className={`mr-2 cursor-pointer rounded px-4 py-2 ${
                 activeTab === 'testCases' ? 'bg-gray-300' : ''
               }`}
             >
               Test Cases
-            </div>
-            <div
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveTab('testResult')}
               className={`cursor-pointer rounded px-4 py-2 ${
                 activeTab === 'testResult' ? 'bg-gray-300' : ''
               }`}
             >
               Test Result
-            </div>
+            </button>
           </div>
 
           {/* Tab Content */}

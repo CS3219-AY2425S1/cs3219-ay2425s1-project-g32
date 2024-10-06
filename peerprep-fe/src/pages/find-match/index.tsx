@@ -1,3 +1,9 @@
+import { Fragment, useState } from 'react';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import Loading from '@/components/ui/loading/loading';
 import {
   Select,
   SelectContent,
@@ -16,10 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Fragment, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import Loading from '@/components/ui/loading/loading';
 
 const FormSchema = z.object({
   difficulty: z.string().min(1, 'Select a difficulty'),
