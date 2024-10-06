@@ -2,6 +2,8 @@ import { Sun, Moon, Laptop2 } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 
+import { Status, useSession } from '@/context/useSession';
+
 import { Button } from './ui/button';
 import {
   DropdownMenu,
@@ -12,10 +14,17 @@ import {
 
 const Header = () => {
   const { setTheme } = useTheme();
+  const { status } = useSession();
+  const onLogout = async () => {
+    // signout
+  };
+
   return (
     <header className="shadow">
       <div className="layout flex justify-between py-5 pt-5">
-        <h1 className="text-2xl font-medium">Peerprep</h1>
+        <h1 className="text-2xl font-medium">
+          <Link href="/">Peerprep</Link>
+        </h1>
         <nav className="flex items-center gap-x-5">
           <Link href="/questions">
             <Button className="font-semibold" variant="ghost">
@@ -47,6 +56,7 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+          {status === Status.AUTHENTICATED && <Button onClick={onLogout}>Log out</Button>}
         </nav>
       </div>
     </header>

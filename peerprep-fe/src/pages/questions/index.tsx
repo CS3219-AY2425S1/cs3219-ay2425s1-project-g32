@@ -51,7 +51,6 @@ export default function QuestionsPage() {
         const data = await api<Question[]>(
           `${process.env.NEXT_PUBLIC_QUESTIONS_BACKEND_URL || ''}/question`
         );
-        console.log(data[0].description);
         setQuestions(data);
       } catch (e) {
         toast({ variant: 'destructive', description: 'Error fetching questions' });

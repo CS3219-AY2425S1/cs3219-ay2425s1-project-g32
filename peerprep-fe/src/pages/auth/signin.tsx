@@ -2,7 +2,6 @@ import { type FC } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle } from 'lucide-react';
-import { signIn } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -76,10 +75,6 @@ export const SignInPage = ({
   const onSubmit = () => {
     console.log(form.getValues('email'));
     console.log(form.getValues('password'));
-    signIn('credentials', {
-      email: form.getValues('email'),
-      password: form.getValues('password'),
-    });
   };
 
   return (
