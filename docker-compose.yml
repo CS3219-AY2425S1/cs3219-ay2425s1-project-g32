@@ -1,9 +1,9 @@
-version: '3'
+version: "3"
 services:
   peerprep-fe:
     build: ./peerprep-fe
     ports:
-     - "3000:3000"
+      - "3000:3000"
     depends_on:
       - peerprep-users
       - peerprep-questions
