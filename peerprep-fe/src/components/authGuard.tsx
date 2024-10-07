@@ -5,6 +5,8 @@ import { useRouter } from 'next/router';
 import { type SessionData, useSession } from '@/context/useSession';
 import { Role, type User } from '@/types/user';
 
+import { useToast } from './ui/toast/use-toast';
+
 /**
  * Authentication configuration
  */
@@ -40,12 +42,14 @@ export const canVisit = (
 
 const AuthGuard: FC<PropsWithChildren<Props>> = ({ children, config }) => {
   const router = useRouter();
+  const { toast } = useToast();
   const { sessionData, loading } = useSession();
 
   useEffect(() => {
     if (loading) return;
 
     if (!sessionData) {
+      toast({ variant: 'destructive', description: 'You need to be signed in' });
       void router.push({
         pathname: '/auth/signin',
         query: {
@@ -61,7 +65,7 @@ const AuthGuard: FC<PropsWithChildren<Props>> = ({ children, config }) => {
         pathname: '/403',
       });
     }
-  }, [sessionData, router, loading, config]);
+  }, [sessionData, router, loading, config, toast]);
 
   // Prevent type error when returning children by itself without fragments
   // eslint-disable-next-line react/jsx-no-useless-fragment
