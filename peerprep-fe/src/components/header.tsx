@@ -2,7 +2,7 @@ import { Sun, Moon, Laptop2 } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 
-import { Status, useSession } from '@/context/useSession';
+import { useSession } from '@/context/useSession';
 
 import { Button } from './ui/button';
 import {
@@ -14,9 +14,11 @@ import {
 
 const Header = () => {
   const { setTheme } = useTheme();
-  const { status } = useSession();
-  const onLogout = async () => {
+  const { sessionData } = useSession();
+  const onLogout = () => {
     // signout
+    localStorage.removeItem('auth');
+    window.location.reload();
   };
 
   return (
@@ -56,7 +58,13 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          {status === Status.AUTHENTICATED && <Button onClick={onLogout}>Log out</Button>}
+          {sessionData ? (
+            <Button onClick={onLogout}>Log out</Button>
+          ) : (
+            <Link href="/auth/signin">
+              <Button>Sign In</Button>
+            </Link>
+          )}
         </nav>
       </div>
     </header>

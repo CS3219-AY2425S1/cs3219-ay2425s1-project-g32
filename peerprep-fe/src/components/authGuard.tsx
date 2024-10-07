@@ -2,7 +2,7 @@ import { type FC, type PropsWithChildren, type ReactElement, useEffect, cloneEle
 
 import { useRouter } from 'next/router';
 
-import { useSession } from '@/context/useSession';
+import { type SessionData, useSession } from '@/context/useSession';
 import { Role, type User } from '@/types/user';
 
 /**
@@ -28,7 +28,7 @@ interface Props {
 }
 
 export const canVisit = (
-  user: User | undefined,
+  user: SessionData['user'] | undefined,
   config: AuthEnabledComponentConfig['authenticationEnabled']
 ): boolean => {
   if (!user) return false;
@@ -40,13 +40,12 @@ export const canVisit = (
 
 const AuthGuard: FC<PropsWithChildren<Props>> = ({ children, config }) => {
   const router = useRouter();
-  const { sessionData, status } = useSession();
+  const { sessionData, loading } = useSession();
 
-  const user = sessionData?.user;
   useEffect(() => {
-    if (status === 'loading') return;
+    if (loading) return;
 
-    if (!user) {
+    if (!sessionData) {
       void router.push({
         pathname: '/auth/signin',
         query: {
@@ -57,16 +56,17 @@ const AuthGuard: FC<PropsWithChildren<Props>> = ({ children, config }) => {
 
       return;
     }
-    if (config.role === Role.ADMIN && user.role === Role.USER) {
+    if (config.role === Role.ADMIN && sessionData.user.role === Role.USER) {
       void router.push({
         pathname: '/403',
       });
     }
-  }, [user, router, status, config]);
+  }, [sessionData, router, loading, config]);
 
   // Prevent type error when returning children by itself without fragments
   // eslint-disable-next-line react/jsx-no-useless-fragment
-  if (canVisit(user, config)) return <>{cloneElement(children, { user })}</>;
+  if (canVisit(sessionData?.user, config))
+    return <>{cloneElement(children, { user: sessionData?.user })}</>;
 
   return (
     <div className="mt-44 flex flex-col items-center">

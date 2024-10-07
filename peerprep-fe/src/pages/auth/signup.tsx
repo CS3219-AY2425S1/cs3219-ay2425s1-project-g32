@@ -27,7 +27,6 @@ const FormSchema = z
 export function getServerSideProps() {
   // Some logic to determine if a redirect is needed
   const isAuthenticated = true; // Replace with your logic
-  console.log('HEY');
   if (isAuthenticated) {
     return {
       redirect: {
