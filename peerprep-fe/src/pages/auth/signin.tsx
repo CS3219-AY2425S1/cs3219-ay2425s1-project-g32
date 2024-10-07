@@ -59,7 +59,8 @@ export const SignInPage = ({
         accessToken: data.data.accessToken,
       };
       initAuth(jwt);
-      setCookie('auth', JSON.stringify(jwt), { maxAge: 10 * 1000 });
+      // 60s * 60 * 12 = 12hour - currently set to lower than jwt expiry
+      setCookie('auth', JSON.stringify(jwt), { maxAge: 60 * 60 * 12 });
       router.push('/');
     } catch (e) {
       toast({
