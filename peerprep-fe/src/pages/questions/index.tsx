@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table';
 import { useToast } from '@/components/ui/toast/use-toast';
 import { type Question } from '@/types/question';
+import { Role } from '@/types/user';
 import { api } from '@/utils/api';
 
 const Difficulty = ({ difficulty }: { difficulty: string }) => {
@@ -33,7 +34,7 @@ const Difficulty = ({ difficulty }: { difficulty: string }) => {
   }
   return <div className={className}>{difficulty}</div>;
 };
-export default function QuestionsPage() {
+const QuestionsPage = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -58,7 +59,7 @@ export default function QuestionsPage() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [toast]);
 
   return (
     <div className="layout my-4">
@@ -102,4 +103,10 @@ export default function QuestionsPage() {
       </div>
     </div>
   );
-}
+};
+
+QuestionsPage.authenticationEnabled = {
+  role: Role.USER,
+};
+
+export default QuestionsPage;

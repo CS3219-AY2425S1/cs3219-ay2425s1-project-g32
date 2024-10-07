@@ -1,3 +1,4 @@
+import { deleteCookie } from 'cookies-next';
 import { Sun, Moon, Laptop2 } from 'lucide-react';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
@@ -17,7 +18,7 @@ const Header = () => {
   const { sessionData } = useSession();
   const onLogout = () => {
     // signout
-    localStorage.removeItem('auth');
+    deleteCookie('auth');
     window.location.reload();
   };
 

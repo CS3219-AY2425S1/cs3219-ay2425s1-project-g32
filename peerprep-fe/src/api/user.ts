@@ -48,3 +48,27 @@ export const signIn = async (email: string, password: string) => {
   }
   return data as SignInResponse;
 };
+
+interface SignUpResponse extends BaseResponse {
+  data: User;
+}
+
+export const signUp = async (username: string, email: string, password: string) => {
+  const res = await api('users', {
+    method: 'POST',
+    body: JSON.stringify({
+      username,
+      email,
+      password,
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  const data: unknown = await res.json();
+  if (!res.ok) {
+    throw Error((data as BaseResponse).message);
+  }
+  return data as SignUpResponse;
+};

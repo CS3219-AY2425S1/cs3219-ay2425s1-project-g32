@@ -9,6 +9,7 @@ import {
   useCallback,
 } from 'react';
 
+import { getCookie } from 'cookies-next';
 import { jwtDecode } from 'jwt-decode';
 
 import { Role, type User } from '@/types/user';
@@ -55,10 +56,10 @@ export const SessionProvider: FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    let value;
-    if (typeof window !== 'undefined') {
-      value = localStorage.getItem('auth');
-    }
+    const value = getCookie('auth');
+    // if (typeof window !== 'undefined') {
+    // value = localStorage.getItem('auth');
+    // }
 
     if (!value) {
       setSessionData(undefined);

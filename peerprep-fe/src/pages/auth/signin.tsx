@@ -1,7 +1,7 @@
-import { type FC } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle } from 'lucide-react';
+import { setCookie } from 'cookies-next';
+import { AlertCircle, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -19,7 +19,6 @@ import {
 import Input from '@/components/ui/input';
 import { useToast } from '@/components/ui/toast/use-toast';
 import { useSession, type LocalStorageJWT } from '@/context/useSession';
-import { getServerAuthSession } from '@/utils/auth';
 
 import type { GetServerSideProps, InferGetServerSidePropsType } from 'next/types';
 
@@ -28,41 +27,14 @@ const FormSchema = z.object({
   password: z.string().min(1, 'Enter your password nig'),
 });
 
-export const getServerSideProps: GetServerSideProps<{ errorCode: string | null }> = async (
-  context
-) => {
-  const session = await getServerAuthSession(context);
-
-  // If the user is already logged in, redirect.
-  // Note: Make sure not to redirect to the same page
-  // To avoid an infinite loop!
-  if (session) {
+// eslint-disable-next-line @typescript-eslint/require-await
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  if (context.req.cookies.auth) {
     return { redirect: { destination: '/', permanent: true } };
   }
   return {
-    props: {
-      errorCode: (context.query.error as string) || null,
-    },
+    props: {},
   };
-};
-
-const ErrorComponent: FC<{ errorCode: string }> = ({ errorCode }) => {
-  switch (errorCode) {
-    case 'Wrong email and/or password':
-      return <div>{errorCode}</div>;
-    case 'CredentialsSignin':
-      return <div>WRONG CREDENTIALS FATASS</div>;
-    case 'OAuthAccountNotLinked':
-      return (
-        <span>
-          You have signed in with another method previously. Please try again with the same method.
-        </span>
-      );
-    case 'SessionRequired':
-      return <span>Please sign in to access this page</span>;
-    default:
-      return <span>Unknown error</span>;
-  }
 };
 
 export const SignInPage = ({
@@ -86,8 +58,8 @@ export const SignInPage = ({
       const jwt: LocalStorageJWT = {
         accessToken: data.data.accessToken,
       };
-      localStorage.setItem('auth', JSON.stringify(jwt));
       initAuth(jwt);
+      setCookie('auth', JSON.stringify(jwt), { maxAge: 10 * 1000 });
       router.push('/');
     } catch (e) {
       toast({
@@ -98,12 +70,11 @@ export const SignInPage = ({
   };
 
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-y-8">
+    <div className="flex flex-grow flex-col items-center justify-center gap-y-8">
       <div className="text-4xl font-bold">PeerPrep</div>
       {errorCode && (
         <div className="text mb-5 flex items-center rounded-lg bg-destructive px-4 py-2 text-sm font-semibold text-white">
           <AlertCircle className="mr-2" />
-          <ErrorComponent errorCode={errorCode} />
         </div>
       )}
       <div className="w-72 rounded-lg bg-gray-100 p-4">
@@ -140,6 +111,14 @@ export const SignInPage = ({
             </Button>
           </form>
         </Form>
+        <div className="mt-4">
+          <Link href="/auth/signup">
+            <Button variant="link" size="sm" className="p-0">
+              Create an account
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );
