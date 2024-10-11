@@ -1,63 +1,49 @@
 import {
-  type PropsWithChildren,
-  type FC,
-  createContext,
-  useContext,
   useEffect,
   useState,
-  useMemo,
+  useRef,
+  useCallback,
 } from 'react';
 
-// Defines the types of data stored in the context
-type WebSocketContextType = {
-  socket: WebSocket | null;
-  messages: string[];
-  loading: boolean;
-  sendMessage: (message: string) => void;
-};
-
-const WebSocketContext = createContext<WebSocketContextType | null>(null);
-
-export const WebSocketProvider: FC<PropsWithChildren> = ({ children }) => {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [loading, setLoading] = useState(true);
+export const useWebSocket = (url: string) => {
   const [messages, setMessages] = useState<string[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const webSocketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080'); // Change if needed
-    setSocket(ws);
+    webSocketRef.current = new WebSocket(url);
 
-    ws.onopen = () => {
-      setLoading(false);
+    webSocketRef.current.onopen = () => {
+      console.log(`Connected to WebSocket: ${url}`);
+      setIsConnected(true);
     };
 
-    ws.onmessage = (event) => {
-      const newMessage: string = event.data as string;
+    webSocketRef.current.onmessage = (event: MessageEvent) => {
+      const newMessage: string = JSON.parse(event.data); // Parse JSON message
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     };
 
-    return () => {
-      ws.close();
+    webSocketRef.current.onerror = (error: Event) => {
+      console.error('WebSocket Error:', error);
     };
-  }, []);
 
-  const sendMessage = (message: string) => {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(message);
+    webSocketRef.current.onclose = () => {
+      console.log('WebSocket disconnected');
+      setIsConnected(false);
+    };
+
+    return () => {
+      webSocketRef.current?.close();
+    };
+  }, [url]);
+
+  const sendMessage = useCallback((message: string) => {
+    if (isConnected && webSocketRef.current) {
+      webSocketRef.current.send(JSON.stringify(message)); 
+    } else {
+      console.error('WebSocket is not connected');
     }
-  };
+  }, [isConnected]);
 
-  const contextValue = useMemo(
-    () => ({
-      socket,
-      loading,
-      messages,
-      sendMessage,
-    }),
-    [socket, loading, messages]
-  );
-
-  return <WebSocketContext.Provider value={contextValue}>{children}</WebSocketContext.Provider>;
+  return { isConnected, messages, sendMessage };
 };
-
-export const useWebSocket = () => useContext(WebSocketContext);
