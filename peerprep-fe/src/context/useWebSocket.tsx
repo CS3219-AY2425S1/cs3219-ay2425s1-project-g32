@@ -1,12 +1,11 @@
-import {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-} from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
+
+interface WebSocketMessage {
+  content: string;
+}
 
 export const useWebSocket = (url: string) => {
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<WebSocketMessage[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const webSocketRef = useRef<WebSocket | null>(null);
 
@@ -19,8 +18,12 @@ export const useWebSocket = (url: string) => {
     };
 
     webSocketRef.current.onmessage = (event: MessageEvent) => {
-      const newMessage: string = JSON.parse(event.data); // Parse JSON message
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      if (typeof event.data === 'string') {
+        const newMessage: WebSocketMessage = JSON.parse(event.data) as WebSocketMessage; // Parse JSON message
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      } else {
+        console.error('Unexpected data type received:', typeof event.data);
+      }
     };
 
     webSocketRef.current.onerror = (error: Event) => {
@@ -37,13 +40,18 @@ export const useWebSocket = (url: string) => {
     };
   }, [url]);
 
-  const sendMessage = useCallback((message: string) => {
-    if (isConnected && webSocketRef.current) {
-      webSocketRef.current.send(JSON.stringify(message)); 
-    } else {
-      console.error('WebSocket is not connected');
-    }
-  }, [isConnected]);
+  const sendMessage = useCallback(
+    (message: string) => {
+      if (isConnected && webSocketRef.current) {
+        webSocketRef.current.send(JSON.stringify(message));
+      } else {
+        console.error('WebSocket is not connected');
+      }
+    },
+    [isConnected]
+  );
 
   return { isConnected, messages, sendMessage };
 };
+
+export default useWebSocket;
