@@ -20,34 +20,49 @@ func NewRepository(mongoClient *mongo.Client) MatchRepository {
 	}
 }
 
-func (qr MatchRepository) GetRequest(id primitive.ObjectID) (model.Request, error) {
-	var question model.Request
+func (qr MatchRepository) GetMatch(id primitive.ObjectID) (model.Match, error) {
+	var question model.Match
 	filter := bson.M{"_id": id}
 	collection := db.GetCollection(qr.mongoClient, "matches")
 	err := collection.FindOne(context.Background(), filter).Decode(&question)
 
 	if err != nil {
-		return model.Request{}, err
+		return model.Match{}, err
 	}
 	return question, nil
 }
 
-func (qr MatchRepository) GetRequestWithUserId(userId string) (model.Request, error) {
-	var request model.Request
+func (qr MatchRepository) GetMatchWithUserId(userId string) (model.Match, error) {
+	var match model.Match
 	filter := bson.M{"user_id": userId}
 	collection := db.GetCollection(qr.mongoClient, "matches")
-	err := collection.FindOne(context.Background(), filter).Decode(&request)
+	err := collection.FindOne(context.Background(), filter).Decode(&match)
 
 	if err != nil {
-		return model.Request{}, err
+		return model.Match{}, err
 	}
-	return request, nil
+	return match, nil
 }
 
 func (mr MatchRepository) DeleteMatchWithUserId(id string) error {
 	filter := bson.M{"user_id": id}
 	collection := db.GetCollection(mr.mongoClient, "matches")
 	_, err := collection.DeleteMany(context.Background(), filter)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (qr MatchRepository) UpdateMatch(id string, updateRequest model.UpdateMatchRequest) error {
+	questionId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return model.InvalidInputError{}
+	}
+	filter := bson.M{"_id": questionId}
+	collection := db.GetCollection(qr.mongoClient, "questions")
+	update := bson.M{"$set": updateRequest}
+	_, err = collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		return err
 	}

@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/api/model"
+	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/model"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/repository"
 )
 
@@ -41,7 +41,7 @@ func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Step 2: Fetch the current status from the database
-	req, err := mc.matchRepository.GetRequestWithUserId(userID)
+	req, err := mc.matchRepository.GetMatchWithUserId(userID)
 	if err != nil {
 		log.Printf("Error fetching match status for user %s: %v", userID, err)
 		http.Error(w, "Failed to fetch match status", http.StatusInternalServerError)

@@ -101,25 +101,29 @@ func (w *Worker) Run() {
 	select {} // Block forever
 }
 
-func (w *Worker) CheckMatch(request model.Request) {
-
+func (w *Worker) CheckMatch(request model.Match) bool {
+	// 1. check requests with same category and complexity
+	// 2. check requests with same complexity
+	// 3. check requests with same category
+	// 4. If no match return
+	return true
 }
 
 func (w *Worker) HandleMessage(req model.MatchRequestMessage) error {
 	// Check DB for any potential matches
-	request, err := w.matchRepository.GetRequest(req.Id)
+	request, err := w.matchRepository.GetMatch(req.Id)
 	if err != nil {
 		log.Printf("Error unmarshalling message: %v", err)
 		return err
 	}
 
-	// 1. check requests with same category and complexity
-	// 2. check requests with same complexity
-	// 3. check requests with same category
-	// 4. If no match return
+	if !w.CheckMatch(request) {
+		return nil
+	}
 
-	// If got match, update DB status and create message for
-	// collaboration
+	// TODO: Create collaboration service message
+	w.matchRepository.UpdateMatch()
+
 	return nil
 }
 
