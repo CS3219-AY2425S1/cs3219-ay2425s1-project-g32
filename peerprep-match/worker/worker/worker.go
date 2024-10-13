@@ -106,23 +106,27 @@ func (w *Worker) CheckMatch(request model.Match) bool {
 	// 2. check requests with same complexity
 	// 3. check requests with same category
 	// 4. If no match return
-	return true
+	return false
 }
 
 func (w *Worker) HandleMessage(req model.MatchRequestMessage) error {
-	// Check DB for any potential matches
-	request, err := w.matchRepository.GetMatch(req.Id)
+	match, err := w.matchRepository.GetMatch(req.Id.String())
 	if err != nil {
 		log.Printf("Error unmarshalling message: %v", err)
 		return err
 	}
 
-	if !w.CheckMatch(request) {
+	if !w.CheckMatch(match) {
 		return nil
 	}
 
 	// TODO: Create collaboration service message
-	w.matchRepository.UpdateMatch()
+	w.matchRepository.UpdateMatch(match.Id.String(), model.UpdateMatchRequest{
+		UserId:     match.UserId,
+		Category:   match.Category,
+		Complexity: match.Complexity,
+		HasMatch:   true,
+	})
 
 	return nil
 }
