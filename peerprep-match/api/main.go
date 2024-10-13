@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/api/controller"
+	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/db"
+	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/repository"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/rs/cors"
@@ -12,7 +14,9 @@ import (
 
 func main() {
 	// connect to db
-	controller := controller.NewMatchController()
+	mongoClient := db.ConnectDB()
+	questionRepository := repository.NewRepository(mongoClient)
+	controller := controller.NewMatchController(questionRepository)
 
 	r := chi.NewRouter()
 	c := cors.New(cors.Options{

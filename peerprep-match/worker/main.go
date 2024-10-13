@@ -6,17 +6,11 @@ import (
 	db "github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/db"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/repository"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/worker/worker"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type MatchRequestMessage struct {
-	Id     primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
-	UserId string             `json:"user_id"`
-}
-
-// Main function where subscription happens
 func main() {
 	mongoClient := db.ConnectDB()
+	// TODO: Set them as a global variable or env variable
 	rabbitURL := "amqp://guest:guest@localhost:5672/"
 	queueName := "test"
 	questionRepository := repository.NewRepository(mongoClient)
