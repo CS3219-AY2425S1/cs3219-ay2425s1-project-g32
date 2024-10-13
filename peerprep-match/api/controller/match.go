@@ -6,12 +6,17 @@ import (
 	"net/http"
 
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/api/model"
+	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/repository"
 )
 
-type MatchController struct{}
+type MatchController struct {
+	matchRepository repository.MatchRepository
+}
 
-func NewMatchController() *MatchController {
-	return &MatchController{}
+func NewMatchController(matchRepository repository.MatchRepository) *MatchController {
+	return &MatchController{
+		matchRepository: matchRepository,
+	}
 }
 
 func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +41,7 @@ func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Step 2: Fetch the current status from the database
-	status, err := db.GetMatchStatus(userID)
+	req, err := mc.matchRepository.GetRequestWithUserId(userID)
 	if err != nil {
 		log.Printf("Error fetching match status for user %s: %v", userID, err)
 		http.Error(w, "Failed to fetch match status", http.StatusInternalServerError)
@@ -45,5 +50,5 @@ func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
 
 	// Step 3: Return the status as JSON
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": string(status)})
+	json.NewEncoder(w).Encode(map[string]bool{"status": req.HasMatch})
 }
