@@ -20,15 +20,11 @@ func NewRepository(mongoClient *mongo.Client) MatchRepository {
 	}
 }
 
-func (qr MatchRepository) GetRequest(id string) (model.Request, error) {
+func (qr MatchRepository) GetRequest(id primitive.ObjectID) (model.Request, error) {
 	var question model.Request
-	questionId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return model.Request{}, err
-	}
-	filter := bson.M{"_id": questionId}
+	filter := bson.M{"_id": id}
 	collection := db.GetCollection(qr.mongoClient, "matches")
-	err = collection.FindOne(context.Background(), filter).Decode(&question)
+	err := collection.FindOne(context.Background(), filter).Decode(&question)
 
 	if err != nil {
 		return model.Request{}, err

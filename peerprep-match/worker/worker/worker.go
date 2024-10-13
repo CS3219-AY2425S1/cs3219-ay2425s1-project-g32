@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/api/model"
+	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/model"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/repository"
 	"github.com/streadway/amqp"
 )
@@ -101,8 +101,17 @@ func (w *Worker) Run() {
 	select {} // Block forever
 }
 
-func (w *Worker) HandleMessage(req model.MatchRequestMessage) {
+func (w *Worker) CheckMatch(request model.Request) {
+
+}
+
+func (w *Worker) HandleMessage(req model.MatchRequestMessage) error {
 	// Check DB for any potential matches
+	request, err := w.matchRepository.GetRequest(req.Id)
+	if err != nil {
+		log.Printf("Error unmarshalling message: %v", err)
+		return err
+	}
 
 	// 1. check requests with same category and complexity
 	// 2. check requests with same complexity
@@ -111,7 +120,7 @@ func (w *Worker) HandleMessage(req model.MatchRequestMessage) {
 
 	// If got match, update DB status and create message for
 	// collaboration
-
+	return nil
 }
 
 func (w *Worker) Close() {
