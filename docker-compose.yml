@@ -19,3 +19,19 @@ services:
     build: ./peerprep-users # Path to your peerprep-users Dockerfile
     ports:
       - "3002:3002"
+
+  peerprep-match-api:
+    build:
+      context: ./peerprep-match
+      dockerfile: ./Dockerfile.api
+    ports:
+      - "3003:3003"
+    depends_on:
+      - peerprep-users
+
+  peerprep-match-worker:
+    build:
+      context: ./peerprep-match
+      dockerfile: ./Dockerfile.worker
+    depends_on:
+      - peerprep-users
