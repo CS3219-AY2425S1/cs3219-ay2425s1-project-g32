@@ -101,12 +101,45 @@ func (w *Worker) Run() {
 	select {} // Block forever
 }
 
-func (w *Worker) CheckMatch(request model.Match) bool {
+func (w *Worker) GetMatch(request model.Match) (*model.Match, error) {
 	// 1. check requests with same category and complexity
+	data, err := w.matchRepository.GetPossibleMatchesForUser(request.UserId, model.GetMatchFilter{
+		Category:   request.Category,
+		Complexity: request.Complexity,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(data) > 0 {
+		return &data[0], nil
+	}
+
 	// 2. check requests with same complexity
+	data, err = w.matchRepository.GetPossibleMatchesForUser(request.UserId, model.GetMatchFilter{
+		Complexity: request.Complexity,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(data) > 0 {
+		return &data[0], nil
+	}
 	// 3. check requests with same category
+	data, err = w.matchRepository.GetPossibleMatchesForUser(request.UserId, model.GetMatchFilter{
+		Category: request.Category,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(data) > 0 {
+		return &data[0], nil
+	}
+
 	// 4. If no match return
-	return false
+	return nil, nil
 }
 
 func (w *Worker) HandleMessage(req model.MatchRequestMessage) error {
@@ -116,11 +149,25 @@ func (w *Worker) HandleMessage(req model.MatchRequestMessage) error {
 		return err
 	}
 
-	if !w.CheckMatch(match) {
+	otherMatch, err := w.GetMatch(match)
+	if err != nil {
+		return err
+	}
+
+	if otherMatch == nil {
 		return nil
 	}
 
 	// TODO: Create collaboration service message
+
+	// Update the 2 user's match status
+	w.matchRepository.UpdateMatch(otherMatch.Id.String(), model.UpdateMatchRequest{
+		UserId:     match.UserId,
+		Category:   match.Category,
+		Complexity: match.Complexity,
+		HasMatch:   true,
+	})
+
 	w.matchRepository.UpdateMatch(match.Id.String(), model.UpdateMatchRequest{
 		UserId:     match.UserId,
 		Category:   match.Category,

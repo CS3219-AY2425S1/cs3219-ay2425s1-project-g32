@@ -28,3 +28,9 @@ type UpdateMatchRequest struct {
 	Complexity string `json:"complexity"`
 	HasMatch   bool   `json:"has_match"`
 }
+
+type GetMatchFilter struct {
+	UserId     string `json:"user_id"`
+	Category   string `json:"category"`
+	Complexity string `json:"complexity"`
+}
