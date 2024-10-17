@@ -47,7 +47,6 @@ const AuthGuard: FC<PropsWithChildren<Props>> = ({ children, config }) => {
 
   useEffect(() => {
     if (loading) return;
-
     if (!sessionData) {
       toast({ variant: 'destructive', description: 'You need to be signed in' });
       void router.push({

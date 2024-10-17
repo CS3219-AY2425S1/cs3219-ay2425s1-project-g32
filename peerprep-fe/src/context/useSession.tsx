@@ -34,7 +34,7 @@ const SessionContext = createContext<SessionContextType>({} as SessionContextTyp
 
 export const SessionProvider: FC<PropsWithChildren> = ({ children }) => {
   const [sessionData, setSessionData] = useState<SessionData>();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const updateAuth = (data: LocalStorageJWT) => {
     const x = jwtDecode<{
       iat: number;
@@ -51,7 +51,6 @@ export const SessionProvider: FC<PropsWithChildren> = ({ children }) => {
     });
   };
   const initAuth = useCallback((jwt: LocalStorageJWT) => {
-    localStorage.setItem('auth', JSON.stringify(jwt));
     updateAuth(jwt);
   }, []);
 
