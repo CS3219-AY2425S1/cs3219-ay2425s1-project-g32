@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/db"
@@ -54,7 +53,11 @@ func (qr MatchRepository) GetPossibleMatchesForUser(userId string, filter model.
 	f["user_id"] = bson.M{"$ne": userId}
 	// Exclude matched rows as well
 	f["has_match"] = false
-	log.Printf("Filter: %+v", f)
+	// Calculate the timestamp for 5 minutes ago
+	fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
+	// Add filter for records created within the last 5 minutes
+	f["created_at"] = bson.M{"$gte": fiveMinutesAgo}
+
 	sortOpts := options.Find().SetSort(bson.D{{"created_at", -1}})
 	collection := db.GetCollection(qr.mongoClient, "matches")
 	cursor, err := collection.Find(context.Background(), f, sortOpts)

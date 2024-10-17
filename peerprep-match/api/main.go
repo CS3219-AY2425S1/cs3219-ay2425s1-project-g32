@@ -22,6 +22,7 @@ func main() {
 		log.Fatalf("Failed to connect to rabbitmq: %v", err)
 		return
 	}
+	mqConn.DeclareQueue()
 	questionRepository := repository.NewRepository(mongoClient)
 	controller := controller.NewMatchController(questionRepository, mqConn)
 

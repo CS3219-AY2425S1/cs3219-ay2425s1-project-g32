@@ -2,6 +2,7 @@ package messagequeue
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -89,6 +90,24 @@ func (r *RabbitMQConn) DeclareQueue() error {
 		nil,         // arguments
 	)
 	return err
+}
+
+func (r *RabbitMQConn) LogQueueStatus() error {
+	queue, err := r.Channel.QueueDeclarePassive(
+		r.QueueName, // name of the queue
+		true,        // durable
+		false,       // delete when unused
+		false,       // exclusive
+		false,       // no-wait
+		nil,         // arguments
+	)
+	if err != nil {
+		return fmt.Errorf("error inspecting queue: %v", err)
+	}
+
+	// Log the queue status (number of messages and consumers)
+	log.Printf("Queue '%s' - Messages: %d, Consumers: %d", r.QueueName, queue.Messages, queue.Consumers)
+	return nil
 }
 
 func (r *RabbitMQConn) Close() {

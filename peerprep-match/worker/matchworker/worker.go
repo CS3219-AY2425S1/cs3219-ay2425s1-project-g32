@@ -35,7 +35,8 @@ func (w *Worker) Run() {
 	}
 	go func() {
 		for msg := range msgs {
-			log.Printf("Received msg: %s", msg.Body)
+			log.Printf("Consumed msg: %s, logging queue status", msg.Body)
+			w.rabbitMQConn.LogQueueStatus()
 			var matchRequestMessage model.MatchRequestMessage
 			err := matchRequestMessage.UnmarshalJSON(msg.Body)
 			if err != nil {
@@ -44,8 +45,10 @@ func (w *Worker) Run() {
 			}
 
 			w.HandleMessage(matchRequestMessage)
+			log.Printf("Done with processing msg, logging queue status")
+			w.rabbitMQConn.LogQueueStatus()
+			time.Sleep(time.Second)
 		}
-		time.Sleep(time.Second)
 	}()
 
 	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
@@ -98,6 +101,13 @@ func (w *Worker) HandleMessage(req model.MatchRequestMessage) error {
 	if err != nil {
 		log.Printf("Error getting match: %v", err)
 		return err
+	}
+
+	// theres an edge case where the req has already been matched
+	// if so we don't want to match again
+	if match.HasMatch {
+		log.Printf("Has already been matched")
+		return nil
 	}
 
 	otherMatch, err := w.GetMatch(match)
