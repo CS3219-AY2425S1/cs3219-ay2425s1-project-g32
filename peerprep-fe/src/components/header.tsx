@@ -34,6 +34,11 @@ const Header = () => {
               View Questions
             </Button>
           </Link>
+          <Link href="/find-match">
+            <Button className="font-semibold" variant="ghost">
+              FInd Match
+            </Button>
+          </Link>
           <div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
