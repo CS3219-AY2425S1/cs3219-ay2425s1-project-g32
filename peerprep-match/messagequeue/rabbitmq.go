@@ -83,7 +83,7 @@ func (r *RabbitMQConn) Consume() (<-chan amqp.Delivery, error) {
 func (r *RabbitMQConn) DeclareQueue() error {
 	_, err := r.Channel.QueueDeclare(
 		r.QueueName, // name
-		true,        // durable
+		false,       // durable
 		false,       // delete when unused
 		false,       // exclusive
 		false,       // no-wait
