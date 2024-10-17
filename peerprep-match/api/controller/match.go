@@ -59,16 +59,17 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 }
 
 func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
-	userID := chi.URLParam(r, "user_id")
-	if userID == "" {
-		http.Error(w, "user_id is required", http.StatusBadRequest)
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		http.Error(w, "request id is required", http.StatusBadRequest)
 		return
 	}
 
 	// Step 2: Fetch the current status from the database
-	req, err := mc.matchRepository.GetMatchWithUserId(userID)
+	prim_id, _ := primitive.ObjectIDFromHex(id)
+	req, err := mc.matchRepository.GetMatch(prim_id)
 	if err != nil {
-		log.Printf("Error fetching match status for user %s: %v", userID, err)
+		log.Printf("Error fetching match status for id %s: %v", id, err)
 		http.Error(w, "Failed to fetch match status", http.StatusInternalServerError)
 		return
 	}
