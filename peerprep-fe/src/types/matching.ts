@@ -1,4 +1,3 @@
 export type Matching = {
-    matchRequest_id: string;
+  matchRequest_id: string;
 };
-  

@@ -1,4 +1,3 @@
 export type Poll = {
-    has_match: boolean;
+  has_match: boolean;
 };
-  
