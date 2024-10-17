@@ -1,4 +1,4 @@
-import { Fragment, useState, useCallback, useEffect } from 'react';
+import { Fragment, useState, useCallback, useEffect, useRef } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -23,6 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useSession } from '@/context/useSession';
+import { Role } from '@/types/user';
 
 const FormSchema = z.object({
   difficulty: z.string().min(1, 'Select a difficulty'),
@@ -34,13 +36,15 @@ const TOPICS = ['all', 'dynamic programming', 'tree', 'string', 'arrays'];
 const MAX_POLL_COUNT = 30; // Maximum number of poll attempts
 const POLL_INTERVAL = 5000; // Poll every 5 seconds
 
-export default function FindMatchPage() {
+const FindMatchPage = () => {
   const [difficulty, setDifficulty] = useState(+new Date());
   const [topic, setTopic] = useState(+new Date());
   const [loading, setLoading] = useState(false);
   const [matchRequestId, setMatchRequestId] = useState<string | null>(null);
   const [pollCount, setPollCount] = useState(0);
   const [error, setError] = useState('');
+  const { sessionData } = useSession();
+  const pollIntervalId = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -51,29 +55,25 @@ export default function FindMatchPage() {
   });
 
   const onSubmit = async () => {
+    if (!sessionData?.user.id) {
+      return;
+    }
+
     setLoading(true);
     setPollCount(0);
     setMatchRequestId(null);
 
-    const formData = {
-      user_id: 'placeholder', // Update with actual user_id
-      complexity: form.getValues('difficulty'),
-      category: form.getValues('topic'),
-    };
-
     try {
       const matchId = await performMatching(
-        formData.user_id,
-        formData.complexity,
-        formData.category
+        sessionData.user.id,
+        form.getValues('difficulty'),
+        form.getValues('topic')
       );
       if (!matchId) {
         throw Error();
       }
-      console.log('Matching id:', matchId);
       setMatchRequestId(matchId);
     } catch (error) {
-      console.error('Error during matching:', error);
       setLoading(false);
       setError('An error occurred while finding a match. Please try again.');
     }
@@ -82,7 +82,6 @@ export default function FindMatchPage() {
   const pollStatus = useCallback(async () => {
     if (!matchRequestId) return;
     if (pollCount >= MAX_POLL_COUNT) {
-      console.log('Matching failed');
       setLoading(false);
       setMatchRequestId(null);
       setError('Failed to find a match. Please try again.');
@@ -91,38 +90,33 @@ export default function FindMatchPage() {
 
     try {
       const hasMatch = await pollMatchingStatus(matchRequestId);
-      console.log('Poll result:', hasMatch);
 
       if (hasMatch) {
-        // Handle successful match
-        console.log('Match found!');
         setLoading(false);
         setMatchRequestId(null);
-        // Navigate to the next page or show match details
       } else {
         setPollCount((prevCount) => prevCount + 1);
-        console.log('Poll count:', pollCount);
-        // Handle failed match
-        console.log('Matching failed');
-        setLoading(false);
-        setMatchRequestId(null);
-        setError('Failed to find a match. Please try again.');
       }
     } catch (error) {
-      console.error('Error during polling:', error);
       setLoading(false);
       setMatchRequestId(null);
+      setPollCount(0);
+      if (pollIntervalId.current !== null) {
+        clearInterval(pollIntervalId.current);
+      }
       setError('An error occurred while checking match status. Please try again.');
     }
   }, [matchRequestId, pollCount, setError]);
 
+  // eslint-disable-next-line consistent-return
   useEffect(() => {
-    const interval = setInterval(() => {
+    pollIntervalId.current = setInterval(() => {
       pollStatus();
     }, POLL_INTERVAL);
-    pollStatus(); // call on mount
-
-    return () => clearInterval(interval);
+    // pollStatus(); // call on mount
+    if (pollIntervalId.current !== null) {
+      return () => clearInterval(pollIntervalId.current as ReturnType<typeof setInterval>);
+    }
   }, [matchRequestId, pollCount, pollStatus, setError]);
 
   return (
@@ -239,4 +233,10 @@ export default function FindMatchPage() {
       </div>
     </div>
   );
-}
+};
+
+FindMatchPage.authenticationEnabled = {
+  role: Role.USER,
+};
+
+export default FindMatchPage;
