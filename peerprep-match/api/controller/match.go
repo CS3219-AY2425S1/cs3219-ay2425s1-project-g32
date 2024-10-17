@@ -5,17 +5,20 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/messagequeue"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/model"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/repository"
 )
 
 type MatchController struct {
 	matchRepository repository.MatchRepository
+	mqConn          *messagequeue.RabbitMQConn
 }
 
-func NewMatchController(matchRepository repository.MatchRepository) *MatchController {
+func NewMatchController(matchRepository repository.MatchRepository, mqConn *messagequeue.RabbitMQConn) *MatchController {
 	return &MatchController{
 		matchRepository: matchRepository,
+		mqConn:          mqConn,
 	}
 }
 
@@ -27,7 +30,14 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// #TODO: dispatch to MQ(s)
+	mqMsg := model.MatchRequestMessage{
+		UserId: matchRequest.UserId,
+	}
+	err := mc.mqConn.Publish(mqMsg)
+	if err != nil {
+		http.Error(w, "Failed to publish match request", http.StatusBadRequest)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"message": "Matching request received. Poll for its status."})

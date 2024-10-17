@@ -1,6 +1,8 @@
 package model
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type MatchRequest struct {
 	UserId     string `json:"user_id"`
@@ -9,8 +11,7 @@ type MatchRequest struct {
 }
 
 type MatchRequestMessage struct {
-	Id     primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
-	UserId string             `json:"user_id"`
+	UserId string `json:"user_id"`
 }
 
 type Match struct {
