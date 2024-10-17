@@ -48,6 +48,7 @@ func (w *Worker) Run() {
 			log.Printf("Done with processing msg, logging queue status")
 			w.rabbitMQConn.LogQueueStatus()
 			time.Sleep(time.Second)
+			msg.Ack(false)
 		}
 	}()
 

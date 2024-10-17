@@ -72,7 +72,7 @@ func (r *RabbitMQConn) Consume() (<-chan amqp.Delivery, error) {
 	return r.Channel.Consume(
 		r.QueueName, // queue
 		"",          // consumer tag
-		true,        // auto-acknowledge
+		false,       // auto-acknowledge
 		false,       // exclusive
 		false,       // no-local
 		false,       // no-wait
@@ -95,7 +95,7 @@ func (r *RabbitMQConn) DeclareQueue() error {
 func (r *RabbitMQConn) LogQueueStatus() error {
 	queue, err := r.Channel.QueueDeclarePassive(
 		r.QueueName, // name of the queue
-		true,        // durable
+		false,       // durable
 		false,       // delete when unused
 		false,       // exclusive
 		false,       // no-wait
