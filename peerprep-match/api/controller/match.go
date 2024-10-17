@@ -42,9 +42,10 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:  primitive.NewDateTimeFromTime(time.Now()),
 	}
 	res, _ := mc.matchRepository.CreateMatch(match)
+	reqId := res.InsertedID.(primitive.ObjectID)
 
 	mqMsg := model.MatchRequestMessage{
-		Id:     res.InsertedID.(primitive.ObjectID),
+		Id:     reqId,
 		UserId: matchRequest.UserId,
 	}
 	err := mc.mqConn.Publish(mqMsg)
@@ -54,7 +55,7 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"message": "Matching request received. Poll for its status."})
+	json.NewEncoder(w).Encode(map[string]string{"id": reqId.Hex()})
 }
 
 func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
