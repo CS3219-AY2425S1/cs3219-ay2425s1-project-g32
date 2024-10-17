@@ -37,7 +37,7 @@ func main() {
 	r.Use(c.Handler)
 	r.Route("/match", func(r chi.Router) {
 		r.Post("/", controller.Match)
-		r.Get("/poll/{id}", controller.Poll)
+		r.Get("/poll/{user_id}", controller.Poll)
 	})
 	log.Println("Running on port 3003")
 	http.ListenAndServe(":3003", r)

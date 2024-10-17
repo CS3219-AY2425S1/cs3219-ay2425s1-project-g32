@@ -4,10 +4,13 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/messagequeue"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/model"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/repository"
+	"github.com/go-chi/chi"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type MatchController struct {
@@ -30,7 +33,18 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// update db
+	match := model.Match{
+		UserId:     matchRequest.UserId,
+		Category:   matchRequest.Category,
+		Complexity: matchRequest.Complexity,
+		HasMatch:   false,
+		CreatedAt:  primitive.NewDateTimeFromTime(time.Now()),
+	}
+	res, _ := mc.matchRepository.CreateMatch(match)
+
 	mqMsg := model.MatchRequestMessage{
+		Id:     res.InsertedID.(primitive.ObjectID),
 		UserId: matchRequest.UserId,
 	}
 	err := mc.mqConn.Publish(mqMsg)
@@ -44,7 +58,7 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 }
 
 func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
-	userID := r.URL.Query().Get("user_id")
+	userID := chi.URLParam(r, "user_id")
 	if userID == "" {
 		http.Error(w, "user_id is required", http.StatusBadRequest)
 		return

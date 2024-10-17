@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"log"
+	"time"
 
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/db"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/model"
@@ -50,6 +52,9 @@ func (qr MatchRepository) GetPossibleMatchesForUser(userId string, filter model.
 
 	// Exclude the current user from possible matches
 	f["user_id"] = bson.M{"$ne": userId}
+	// Exclude matched rows as well
+	f["has_match"] = false
+	log.Printf("Filter: %+v", f)
 	sortOpts := options.Find().SetSort(bson.D{{"created_at", -1}})
 	collection := db.GetCollection(qr.mongoClient, "matches")
 	cursor, err := collection.Find(context.Background(), f, sortOpts)
@@ -69,16 +74,11 @@ func (qr MatchRepository) GetPossibleMatchesForUser(userId string, filter model.
 	return matches, nil
 }
 
-func (qr MatchRepository) GetMatch(id string) (model.Match, error) {
-	questionId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return model.Match{}, model.InvalidInputError{}
-	}
-
+func (qr MatchRepository) GetMatch(id primitive.ObjectID) (model.Match, error) {
 	var match model.Match
-	filter := bson.M{"_id": questionId}
+	filter := bson.M{"_id": id}
 	collection := db.GetCollection(qr.mongoClient, "matches")
-	err = collection.FindOne(context.Background(), filter).Decode(&match)
+	err := collection.FindOne(context.Background(), filter).Decode(&match)
 
 	if err != nil {
 		return model.Match{}, err
@@ -108,17 +108,25 @@ func (mr MatchRepository) DeleteMatchWithUserId(id string) error {
 	return nil
 }
 
-func (qr MatchRepository) UpdateMatch(id string, updateRequest model.UpdateMatchRequest) error {
-	questionId, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return model.InvalidInputError{}
-	}
+func (qr MatchRepository) UpdateMatch(questionId primitive.ObjectID, updateRequest model.UpdateMatchRequest) error {
 	filter := bson.M{"_id": questionId}
-	collection := db.GetCollection(qr.mongoClient, "questions")
+	collection := db.GetCollection(qr.mongoClient, "matches")
 	update := bson.M{"$set": updateRequest}
-	_, err = collection.UpdateOne(context.Background(), filter, update)
+	_, err := collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (qr MatchRepository) CreateMatch(match model.Match) (*mongo.InsertOneResult, error) {
+	collection := db.GetCollection(qr.mongoClient, "matches")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	result, err := collection.InsertOne(ctx, match)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

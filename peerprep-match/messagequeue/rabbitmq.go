@@ -27,6 +27,7 @@ func ConnectRabbitMQ() (*RabbitMQConn, error) {
 	conn, err := amqp.Dial(uri)
 	queue_name := os.Getenv("RABBIT_MQ_NAME")
 	if err != nil {
+		log.Fatal("Error creating conn to rabbitmq, %s", err)
 		return nil, err
 	}
 
@@ -64,4 +65,33 @@ func (r *RabbitMQConn) Publish(msg model.MatchRequestMessage) error {
 		},
 	)
 	return err
+}
+
+func (r *RabbitMQConn) Consume() (<-chan amqp.Delivery, error) {
+	return r.Channel.Consume(
+		r.QueueName, // queue
+		"",          // consumer tag
+		true,        // auto-acknowledge
+		false,       // exclusive
+		false,       // no-local
+		false,       // no-wait
+		nil,         // arguments
+	)
+}
+
+func (r *RabbitMQConn) DeclareQueue() error {
+	_, err := r.Channel.QueueDeclare(
+		r.QueueName, // name
+		true,        // durable
+		false,       // delete when unused
+		false,       // exclusive
+		false,       // no-wait
+		nil,         // arguments
+	)
+	return err
+}
+
+func (r *RabbitMQConn) Close() {
+	r.Channel.Close()
+	r.Conn.Close()
 }
