@@ -58,7 +58,7 @@ func (qr MatchRepository) GetPossibleMatchesForUser(userId string, filter model.
 	// Add filter for records created within the last 5 minutes
 	f["created_at"] = bson.M{"$gte": fiveMinutesAgo}
 
-	sortOpts := options.Find().SetSort(bson.D{{"created_at", -1}})
+	sortOpts := options.Find().SetSort(bson.D{{"created_at", 1}})
 	collection := db.GetCollection(qr.mongoClient, "matches")
 	cursor, err := collection.Find(context.Background(), f, sortOpts)
 	if err != nil {
