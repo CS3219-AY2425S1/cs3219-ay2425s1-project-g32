@@ -9,7 +9,6 @@ import (
 )
 
 type MatchRequest struct {
-	UserId     string `json:"user_id" bson:"user_id"`
 	Category   string `json:"category"`
 	Complexity string `json:"complexity"`
 }

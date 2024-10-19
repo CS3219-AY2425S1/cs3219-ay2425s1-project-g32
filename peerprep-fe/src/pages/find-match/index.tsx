@@ -49,7 +49,7 @@ const POLL_INTERVAL = 3000; // Poll every 5 seconds
 const FindMatchPage = () => {
   const [difficulty, setDifficulty] = useState(+new Date());
   const [topic, setTopic] = useState(+new Date());
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [matchRequestId, setMatchRequestId] = useState<string | null>(null);
   const [pollCount, setPollCount] = useState(0);
   const [error, setError] = useState('');
@@ -77,9 +77,9 @@ const FindMatchPage = () => {
 
     try {
       const matchId = await performMatching(
-        sessionData.user.id,
         form.getValues('difficulty'),
-        form.getValues('topic')
+        form.getValues('topic'),
+        sessionData.accessToken
       );
       if (!matchId) {
         throw Error();
@@ -93,7 +93,7 @@ const FindMatchPage = () => {
 
   const pollStatus = useCallback(
     async (matchRequestId: string) => {
-      if (pollCount >= MAX_POLL_COUNT) {
+      if (pollCount >= MAX_POLL_COUNT || !sessionData) {
         setLoading(false);
         setMatchRequestId(null);
         setError('Failed to find a match. Please try again.');
@@ -101,7 +101,7 @@ const FindMatchPage = () => {
       }
 
       try {
-        const hasMatch = await pollMatchingStatus(matchRequestId);
+        const hasMatch = await pollMatchingStatus(matchRequestId, sessionData.accessToken);
 
         if (hasMatch) {
           setLoading(false);
@@ -120,7 +120,7 @@ const FindMatchPage = () => {
         setError('An error occurred while checking match status. Please try again.');
       }
     },
-    [pollCount, router, toast, setError]
+    [pollCount, router, toast, setError, sessionData]
   );
 
   // eslint-disable-next-line consistent-return

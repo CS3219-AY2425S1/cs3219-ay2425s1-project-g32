@@ -18,6 +18,7 @@ export interface SessionData {
   user: Pick<User, 'id' | 'role'>;
   iat: number;
   exp: number;
+  accessToken: string;
 }
 
 export interface LocalStorageJWT {
@@ -48,6 +49,7 @@ export const SessionProvider: FC<PropsWithChildren> = ({ children }) => {
         id: x.id,
         role: Role.USER,
       },
+      accessToken: data.accessToken,
     });
   };
   const initAuth = useCallback((jwt: LocalStorageJWT) => {

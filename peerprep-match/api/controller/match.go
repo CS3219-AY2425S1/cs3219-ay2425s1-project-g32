@@ -2,10 +2,12 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
+	authMiddleware "github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/api/middleware"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/messagequeue"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/model"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/repository"
@@ -26,6 +28,14 @@ func NewMatchController(matchRepository repository.MatchRepository, mqConn *mess
 }
 
 func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(authMiddleware.UserKey).(*authMiddleware.User)
+	if !ok {
+		http.Error(w, "User not found in context", http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Printf("Processing %s user match request\n", user.Username)
+
 	var matchRequest model.MatchRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&matchRequest); err != nil {
@@ -35,7 +45,7 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 
 	// update db
 	match := model.Match{
-		UserId:     matchRequest.UserId,
+		UserId:     user.Id,
 		Category:   matchRequest.Category,
 		Complexity: matchRequest.Complexity,
 		HasMatch:   false,
@@ -46,7 +56,7 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 
 	mqMsg := model.MatchRequestMessage{
 		Id:     reqId,
-		UserId: matchRequest.UserId,
+		UserId: user.Id,
 	}
 	err := mc.mqConn.Publish(mqMsg)
 	if err != nil {
