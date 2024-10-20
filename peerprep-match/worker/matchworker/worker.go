@@ -58,6 +58,7 @@ func (w *Worker) Run() {
 
 func (w *Worker) GetMatch(request model.Match) (*model.Match, error) {
 	// 1. check requests with same category and complexity
+	log.Printf("Looking for match requests with the same category and complexity")
 	data, err := w.matchRepository.GetPossibleMatchesForUser(request.UserId, model.GetMatchFilter{
 		Category:   request.Category,
 		Complexity: request.Complexity,
@@ -67,10 +68,12 @@ func (w *Worker) GetMatch(request model.Match) (*model.Match, error) {
 	}
 
 	if len(data) > 0 {
+		log.Printf("Found %d match requests with the same category and complexity, matching with the oldest one.", len(data))
 		return &data[0], nil
 	}
 
 	// 2. check requests with same complexity
+	log.Printf("None with same category and complexity. Looking for match requests with the same complexity.")
 	data, err = w.matchRepository.GetPossibleMatchesForUser(request.UserId, model.GetMatchFilter{
 		Complexity: request.Complexity,
 	})
@@ -79,13 +82,16 @@ func (w *Worker) GetMatch(request model.Match) (*model.Match, error) {
 	}
 
 	if len(data) > 0 {
+		log.Printf("Found %d match requests with the complexity, matching with the oldest one.", len(data))
 		return &data[0], nil
 	}
 	// 3. check requests with same category
+	log.Printf("None with same complexity. Looking for match requests with the same category.")
 	data, err = w.matchRepository.GetPossibleMatchesForUser(request.UserId, model.GetMatchFilter{
 		Category: request.Category,
 	})
 	if err != nil {
+		log.Printf("Found %d match requests with the same category, matching with the oldest one.", len(data))
 		return nil, err
 	}
 
