@@ -55,9 +55,12 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 
 	if activeReq != zeroMatch {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
-			"id":     activeReq.Id.Hex(),
-			"is_new": "false",
+		json.NewEncoder(w).Encode(struct {
+			Id    string `json:"id"`
+			IsNew bool   `json:"isNew"`
+		}{
+			activeReq.Id.Hex(),
+			false,
 		})
 		return
 	}
@@ -85,9 +88,12 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"id":     reqId.Hex(),
-		"is_new": "true",
+	json.NewEncoder(w).Encode(struct {
+		Id    string `json:"id"`
+		IsNew bool   `json:"isNew"`
+	}{
+		activeReq.Id.Hex(),
+		true,
 	})
 }
 
