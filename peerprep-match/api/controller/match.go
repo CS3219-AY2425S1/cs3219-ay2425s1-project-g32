@@ -53,7 +53,7 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 	}
 	var zeroMatch model.Match
 
-	if activeReq == zeroMatch {
+	if activeReq != zeroMatch {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{
 			"id":     activeReq.Id.Hex(),
