@@ -59,8 +59,8 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 			Id    string `json:"id"`
 			IsNew bool   `json:"isNew"`
 		}{
-			activeReq.Id.Hex(),
-			false,
+			Id:    activeReq.Id.Hex(),
+			IsNew: false,
 		})
 		return
 	}
@@ -92,8 +92,8 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 		Id    string `json:"id"`
 		IsNew bool   `json:"isNew"`
 	}{
-		activeReq.Id.Hex(),
-		true,
+		Id:    reqId.Hex(),
+		IsNew: true,
 	})
 }
 
