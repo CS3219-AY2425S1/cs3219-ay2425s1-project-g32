@@ -117,7 +117,9 @@ func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
 	if req.HasMatch {
 		status = "Matched"
 	} else {
-		if req.IsCancelled {
+		if time.Since(req.CreatedAt.Time()) > 5*time.Minute {
+			status = "Timeout"
+		} else if req.IsCancelled {
 			status = "Cancelled"
 		} else {
 			status = "Matching"
