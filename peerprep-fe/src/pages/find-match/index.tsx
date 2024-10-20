@@ -48,12 +48,12 @@ const POLL_INTERVAL = 3000; // Poll every 5 seconds
 const FindMatchPage = () => {
   const [difficulty, setDifficulty] = useState(+new Date());
   const [topic, setTopic] = useState(+new Date());
-  const [loading, setLoading] = useState(false);
-  const [matchRequestId, setMatchRequestId] = useState<string | null>(null);
+  const [matchRequestId, setMatchRequestId] = useState('');
   const [error, setError] = useState('');
   const { sessionData } = useSession();
   const pollIntervalId = useRef<ReturnType<typeof setInterval> | null>(null);
   const [time, setTime] = useState(0);
+  const [displayHint, setDisplayHint] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -66,46 +66,45 @@ const FindMatchPage = () => {
   });
 
   const onSubmit = async () => {
-    if (!sessionData?.user.id) {
+    if (!sessionData) {
       return;
     }
 
-    setLoading(true);
     setTime(0);
-    setMatchRequestId(null);
+    setMatchRequestId('');
+    setDisplayHint(false);
 
     try {
-      const matchId = await performMatching(
+      const res = await performMatching(
         form.getValues('difficulty'),
         form.getValues('topic'),
         sessionData.accessToken
       );
-      if (!matchId) {
-        throw Error();
+
+      setMatchRequestId(res.id);
+      if (!res.isNew) {
+        setDisplayHint(true);
       }
-      setMatchRequestId(matchId);
     } catch (error) {
-      setLoading(false);
       setError('An error occurred while finding a match. Please try again.');
     }
   };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (loading) {
+    if (matchRequestId) {
       interval = setInterval(() => {
         setTime((prevTime) => prevTime + 10);
       }, 10);
     }
 
     return () => clearInterval(interval);
-  }, [loading]);
+  }, [matchRequestId]);
 
   const pollStatus = useCallback(
     async (matchRequestId: string) => {
       if (!sessionData) {
-        setLoading(false);
-        setMatchRequestId(null);
+        setMatchRequestId('');
         setError('Failed to find a match. Please try again.');
         return;
       }
@@ -114,8 +113,7 @@ const FindMatchPage = () => {
         const status = await pollMatchingStatus(matchRequestId, sessionData.accessToken);
         switch (status) {
           case PollStatus.MATCHED: {
-            setLoading(false);
-            setMatchRequestId(null);
+            setMatchRequestId('');
             toast({ description: 'Found a match, redirecting you to collaborative page' });
             router.push('/question');
             break;
@@ -124,17 +122,15 @@ const FindMatchPage = () => {
             break;
           }
           case PollStatus.CANCELLED:
-            setError('Timeout please try again.');
-            setLoading(false);
-            setMatchRequestId(null);
+            setError('Could not find a match, please try again.');
+            setMatchRequestId('');
             break;
           default: {
             throw Error();
           }
         }
       } catch (error) {
-        setLoading(false);
-        setMatchRequestId(null);
+        setMatchRequestId('');
         if (pollIntervalId.current !== null) {
           clearInterval(pollIntervalId.current);
         }
@@ -159,7 +155,7 @@ const FindMatchPage = () => {
 
   return (
     <>
-      <Dialog open={loading} onOpenChange={setLoading}>
+      <Dialog open={!!matchRequestId}>
         <DialogContent
           // To prevent accidental closure of the dialog when clicking outside bg
           onInteractOutside={(e) => e.preventDefault()}
@@ -169,7 +165,16 @@ const FindMatchPage = () => {
           <DialogHeader>
             <DialogTitle>Finding a match now...</DialogTitle>
             <DialogDescription>
-              Closing this popup ends the search and you will need to find match again.
+              <div>Closing this popup ends the search and you will need to find match again.</div>
+              {displayHint && (
+                <>
+                  <div>
+                    You have previously searched for a match and we are still looking for that
+                    match.
+                  </div>
+                  <div>Please cancel if you would like to reset make a new search</div>
+                </>
+              )}
               <BlockSpinning height="100" width="100" />
               <strong>Time elapsed</strong>: {Math.floor(time / 60000)}.
               {Math.floor((time % 60000) / 1000)}
@@ -183,11 +188,11 @@ const FindMatchPage = () => {
                   return;
                 }
 
-                setLoading(false);
                 cancelMatch(matchRequestId, sessionData?.accessToken);
                 if (pollIntervalId.current !== null) {
                   clearInterval(pollIntervalId.current);
                 }
+                setMatchRequestId('');
               }}
             >
               Cancel search
@@ -206,7 +211,7 @@ const FindMatchPage = () => {
           {error && <div className="mb-4 rounded-md bg-red-100 p-4 text-red-700">{error}</div>}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className={`flex flex-col gap-y-5 ${loading ? 'opacity-50' : ''}`}>
+              <div className={`flex flex-col gap-y-5 ${matchRequestId ? 'opacity-50' : ''}`}>
                 <FormField
                   control={form.control}
                   name="difficulty"
@@ -226,7 +231,7 @@ const FindMatchPage = () => {
                         </Badge>
                       </FormLabel>
                       <Select
-                        disabled={loading}
+                        disabled={!!matchRequestId}
                         key={difficulty}
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -273,7 +278,7 @@ const FindMatchPage = () => {
                         </Badge>
                       </FormLabel>
                       <Select
-                        disabled={loading}
+                        disabled={!!matchRequestId}
                         key={topic}
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -301,7 +306,7 @@ const FindMatchPage = () => {
                     </FormItem>
                   )}
                 />
-                <Button disabled={loading} className="w-full" type="submit">
+                <Button disabled={!!matchRequestId} className="w-full" type="submit">
                   Find Match
                 </Button>
               </div>

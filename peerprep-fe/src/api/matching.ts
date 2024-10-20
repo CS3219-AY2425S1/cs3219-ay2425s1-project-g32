@@ -8,6 +8,7 @@ export interface BaseResponse {
 
 export interface MatchingBackendResponse {
   id: string;
+  isNew: boolean;
 }
 
 export enum PollStatus {
@@ -39,7 +40,7 @@ export const performMatching = async (complexity: string, category: string, toke
     throw Error((data as BaseResponse).message);
   }
 
-  return (data as MatchingBackendResponse).id;
+  return data as MatchingBackendResponse;
 };
 
 export const pollMatchingStatus = async (matchRequestId: string, token: string) => {
