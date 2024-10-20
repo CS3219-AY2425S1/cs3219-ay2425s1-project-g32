@@ -65,7 +65,7 @@ export const pollMatchingStatus = async (matchRequestId: string, token: string) 
 };
 
 export const cancelMatch = async (matchId: string, token: string) => {
-  const res = await api('match', {
+  return api('match/cancel', {
     method: 'POST',
     body: JSON.stringify({
       matchId,
@@ -75,9 +75,4 @@ export const cancelMatch = async (matchId: string, token: string) => {
       Authorization: `Bearer ${token}`,
     },
   });
-
-  const data: unknown = await res.json();
-  if (!res.ok) {
-    throw Error((data as BaseResponse).message);
-  }
 };

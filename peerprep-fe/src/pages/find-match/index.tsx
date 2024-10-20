@@ -184,7 +184,6 @@ const FindMatchPage = () => {
                 if (!sessionData?.accessToken || !matchRequestId) {
                   return;
                 }
-
                 await cancelMatch(matchRequestId, sessionData?.accessToken);
                 if (pollIntervalId.current !== null) {
                   clearInterval(pollIntervalId.current);
