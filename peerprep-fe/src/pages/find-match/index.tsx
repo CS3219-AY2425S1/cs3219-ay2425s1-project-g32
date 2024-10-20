@@ -120,9 +120,14 @@ const FindMatchPage = () => {
             break;
           }
           case PollStatus.CANCELLED:
-            setError('Could not find a match, please try again.');
+            setError('This request has been cancelled, please try again');
             setMatchRequestId('');
             break;
+          case PollStatus.TIMEOUT: {
+            setError('Timeout finding a match, please try again later');
+            setMatchRequestId('');
+            break;
+          }
           default: {
             throw Error();
           }
@@ -173,8 +178,7 @@ const FindMatchPage = () => {
                 </>
               )}
               <BlockSpinning height="100" width="100" />
-              <strong>Time elapsed</strong>: {Math.floor(time / 60000)}.
-              {Math.floor((time % 60000) / 1000)}
+              <strong>Time elapsed</strong>:&nbsp;{Math.floor(time / 1000)}s
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
