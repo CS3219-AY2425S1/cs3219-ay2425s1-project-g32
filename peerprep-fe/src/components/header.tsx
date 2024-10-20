@@ -36,7 +36,7 @@ const Header = () => {
           </Link>
           <Link href="/find-match">
             <Button className="font-semibold" variant="ghost">
-              FInd Match
+              Find Match
             </Button>
           </Link>
           <div>

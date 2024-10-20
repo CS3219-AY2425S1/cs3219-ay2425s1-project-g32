@@ -1,12 +1,12 @@
 version: "3"
 services:
-  # peerprep-fe:
-  #   build: ./peerprep-fe
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - peerprep-users
-  #     - peerprep-questions
+  peerprep-fe:
+    build: ./peerprep-fe
+    ports:
+      - "3000:3000"
+    depends_on:
+      - peerprep-users
+      - peerprep-questions
 
   peerprep-questions:
     build: ./peerprep-questions # Path to your peerprep-questions Dockerfile
