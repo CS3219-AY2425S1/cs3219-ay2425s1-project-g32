@@ -165,14 +165,13 @@ const FindMatchPage = () => {
           <DialogHeader>
             <DialogTitle>Finding a match now...</DialogTitle>
             <DialogDescription>
-              <div>Closing this popup ends the search and you will need to find match again.</div>
+              Closing this popup ends the search and you will need to find match again.
+              <br />
               {displayHint && (
                 <>
-                  <div>
-                    You have previously searched for a match and we are still looking for that
-                    match.
-                  </div>
-                  <div>Please cancel if you would like to reset make a new search</div>
+                  You have previously searched for a match and we are still looking for that match.
+                  <br />
+                  Please cancel if you would like to reset make a new search
                 </>
               )}
               <BlockSpinning height="100" width="100" />
