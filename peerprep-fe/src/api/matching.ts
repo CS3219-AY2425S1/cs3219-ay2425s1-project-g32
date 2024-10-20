@@ -12,9 +12,9 @@ export interface MatchingBackendResponse {
 }
 
 export enum PollStatus {
-  MATCHING = 'matching',
-  MATCHED = 'matched',
-  CANCELLED = 'cancelled',
+  MATCHING = 'Matching',
+  MATCHED = 'Matched',
+  CANCELLED = 'Cancelled',
 }
 
 export interface MatchingPollBackendResponse {
@@ -57,7 +57,6 @@ export const pollMatchingStatus = async (matchRequestId: string, token: string) 
   }
 
   const { status } = data as MatchingPollBackendResponse;
-
   if (Object.values(PollStatus).includes(status as PollStatus)) {
     return status as PollStatus;
   }
