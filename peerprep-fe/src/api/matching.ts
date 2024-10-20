@@ -68,7 +68,7 @@ export const cancelMatch = async (matchId: string, token: string) => {
   return api('match/cancel', {
     method: 'POST',
     body: JSON.stringify({
-      matchId,
+      id: matchId,
     }),
     headers: {
       'Content-Type': 'application/json',
