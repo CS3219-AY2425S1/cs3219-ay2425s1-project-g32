@@ -1,4 +1,4 @@
-FROM node as dependencies
+FROM node:18 as dependencies
 
 # Create app directory in the docker container
 RUN mkdir -p /app
@@ -10,7 +10,7 @@ COPY package.json package-lock.json ./
 # install dependencides with lockfile
 RUN npm ci
 
-FROM node as builder
+FROM node:18 as builder
 
 # Create app directory in docker container
 WORKDIR /app
