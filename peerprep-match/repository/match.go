@@ -114,7 +114,15 @@ func (qr MatchRepository) GetActiveMatchWithUserId(userId string) (model.Match, 
 	// Set sort option to retrieve the most recent document based on "created_at"
 	opts := options.FindOne().SetSort(bson.D{{"created_at", -1}})
 
-	err := collection.FindOne(context.Background(), filter, opts).Decode(&match)
+	res := collection.FindOne(context.Background(), filter, opts)
+
+	if err := res.Err(); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return model.Match{}, nil
+		}
+		return model.Match{}, err
+	}
+	err := res.Decode(&match)
 
 	if err != nil {
 		return model.Match{}, err

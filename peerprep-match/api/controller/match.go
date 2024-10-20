@@ -47,7 +47,8 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 	activeReq, err := mc.matchRepository.GetActiveMatchWithUserId(user.Id)
 
 	if err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
+		log.Printf("Failed to check db, error: %s", err)
+		http.Error(w, "Failed to check db", http.StatusInternalServerError)
 		return
 	}
 	var zeroMatch model.Match
