@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
-import { performMatching, pollMatchingStatus } from '@/api/matching';
+import { cancelMatch, performMatching, pollMatchingStatus, PollStatus } from '@/api/matching';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -43,7 +43,6 @@ const FormSchema = z.object({
 
 const DIFFICULTIES = ['all', 'easy', 'medium', 'hard'];
 const TOPICS = ['all', 'dynamic programming', 'tree', 'string', 'arrays'];
-const MAX_POLL_COUNT = 3; // Maximum number of poll attempts
 const POLL_INTERVAL = 3000; // Poll every 5 seconds
 
 const FindMatchPage = () => {
@@ -51,10 +50,10 @@ const FindMatchPage = () => {
   const [topic, setTopic] = useState(+new Date());
   const [loading, setLoading] = useState(false);
   const [matchRequestId, setMatchRequestId] = useState<string | null>(null);
-  const [pollCount, setPollCount] = useState(0);
   const [error, setError] = useState('');
   const { sessionData } = useSession();
   const pollIntervalId = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [time, setTime] = useState(0);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -72,7 +71,7 @@ const FindMatchPage = () => {
     }
 
     setLoading(true);
-    setPollCount(0);
+    setTime(0);
     setMatchRequestId(null);
 
     try {
@@ -91,9 +90,20 @@ const FindMatchPage = () => {
     }
   };
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (loading) {
+      interval = setInterval(() => {
+        setTime((prevTime) => prevTime + 10);
+      }, 10);
+    }
+
+    return () => clearInterval(interval);
+  }, [loading]);
+
   const pollStatus = useCallback(
     async (matchRequestId: string) => {
-      if (pollCount >= MAX_POLL_COUNT || !sessionData) {
+      if (!sessionData) {
         setLoading(false);
         setMatchRequestId(null);
         setError('Failed to find a match. Please try again.');
@@ -101,15 +111,26 @@ const FindMatchPage = () => {
       }
 
       try {
-        const hasMatch = await pollMatchingStatus(matchRequestId, sessionData.accessToken);
-
-        if (hasMatch) {
-          setLoading(false);
-          setMatchRequestId(null);
-          toast({ description: 'Found a match, redirecting you to collaborative page' });
-          router.push('/question');
-        } else {
-          setPollCount((prevCount) => prevCount + 1);
+        const status = await pollMatchingStatus(matchRequestId, sessionData.accessToken);
+        switch (status) {
+          case PollStatus.MATCHED: {
+            setLoading(false);
+            setMatchRequestId(null);
+            toast({ description: 'Found a match, redirecting you to collaborative page' });
+            router.push('/question');
+            break;
+          }
+          case PollStatus.MATCHING: {
+            break;
+          }
+          case PollStatus.CANCELLED:
+            setError('Timeout please try again.');
+            setLoading(false);
+            setMatchRequestId(null);
+            break;
+          default: {
+            throw Error();
+          }
         }
       } catch (error) {
         setLoading(false);
@@ -120,7 +141,7 @@ const FindMatchPage = () => {
         setError('An error occurred while checking match status. Please try again.');
       }
     },
-    [pollCount, router, toast, setError, sessionData]
+    [router, toast, setError, sessionData]
   );
 
   // eslint-disable-next-line consistent-return
@@ -150,13 +171,20 @@ const FindMatchPage = () => {
             <DialogDescription>
               Closing this popup ends the search and you will need to find match again.
               <BlockSpinning height="100" width="100" />
+              <strong>Time elapsed</strong>: {Math.floor(time / 60000)}.
+              {Math.floor((time % 60000) / 1000)}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
               variant="destructive"
               onClick={() => {
+                if (!sessionData?.accessToken || !matchRequestId) {
+                  return;
+                }
+
                 setLoading(false);
+                cancelMatch(matchRequestId, sessionData?.accessToken);
                 if (pollIntervalId.current !== null) {
                   clearInterval(pollIntervalId.current);
                 }
