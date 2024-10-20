@@ -41,6 +41,7 @@ func main() {
 	r.Route("/match", func(r chi.Router) {
 		r.Post("/", controller.Match)
 		r.Get("/poll/{id}", controller.Poll)
+		r.Post("/cancel", controller.Cancel)
 	})
 	log.Println("Running on port 3003")
 	http.ListenAndServe(":3003", r)

@@ -43,13 +43,32 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check if user has any active match requests
+	activeReq, err := mc.matchRepository.GetActiveMatchWithUserId(user.Id)
+
+	if err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+	var zeroMatch model.Match
+
+	if activeReq == zeroMatch {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{
+			"id":     activeReq.Id.Hex(),
+			"is_new": "false",
+		})
+		return
+	}
+
 	// update db
 	match := model.Match{
-		UserId:     user.Id,
-		Category:   matchRequest.Category,
-		Complexity: matchRequest.Complexity,
-		HasMatch:   false,
-		CreatedAt:  primitive.NewDateTimeFromTime(time.Now()),
+		UserId:      user.Id,
+		Category:    matchRequest.Category,
+		Complexity:  matchRequest.Complexity,
+		HasMatch:    false,
+		CreatedAt:   primitive.NewDateTimeFromTime(time.Now()),
+		IsCancelled: false,
 	}
 	res, _ := mc.matchRepository.CreateMatch(match)
 	reqId := res.InsertedID.(primitive.ObjectID)
@@ -58,14 +77,17 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 		Id:     reqId,
 		UserId: user.Id,
 	}
-	err := mc.mqConn.Publish(mqMsg)
+	err = mc.mqConn.Publish(mqMsg)
 	if err != nil {
 		http.Error(w, "Failed to publish match request", http.StatusBadRequest)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"id": reqId.Hex()})
+	json.NewEncoder(w).Encode(map[string]string{
+		"id":     reqId.Hex(),
+		"is_new": "true",
+	})
 }
 
 func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
@@ -84,7 +106,35 @@ func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var status string
+	if req.HasMatch {
+		status = "Matched"
+	} else {
+		if req.IsCancelled {
+			status = "Cancelled"
+		} else {
+			status = "Matching"
+		}
+	}
+
 	// Step 3: Return the status as JSON
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]bool{"status": req.HasMatch})
+	json.NewEncoder(w).Encode(map[string]string{"status": status})
+}
+
+func (mc *MatchController) Cancel(w http.ResponseWriter, r *http.Request) {
+	var cancelRequest model.CancelRequest
+	err := json.NewDecoder(r.Body).Decode(&cancelRequest)
+	if err != nil {
+		http.Error(w, "Invalid id", http.StatusBadRequest)
+		return
+	}
+
+	err = mc.matchRepository.CancelMatch(cancelRequest)
+	if err != nil {
+		http.Error(w, "Failed to set as cancelled", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 }

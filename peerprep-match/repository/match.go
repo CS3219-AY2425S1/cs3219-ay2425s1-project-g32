@@ -101,6 +101,27 @@ func (qr MatchRepository) GetMatchWithUserId(userId string) (model.Match, error)
 	return match, nil
 }
 
+func (qr MatchRepository) GetActiveMatchWithUserId(userId string) (model.Match, error) {
+	var match model.Match
+	filter := bson.M{"user_id": userId}
+	// Calculate the timestamp for 5 minutes ago
+	fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
+	// Add filter for records created within the last 5 minutes
+	filter["created_at"] = bson.M{"$gte": fiveMinutesAgo}
+
+	collection := db.GetCollection(qr.mongoClient, "matches")
+
+	// Set sort option to retrieve the most recent document based on "created_at"
+	opts := options.FindOne().SetSort(bson.D{{"created_at", -1}})
+
+	err := collection.FindOne(context.Background(), filter, opts).Decode(&match)
+
+	if err != nil {
+		return model.Match{}, err
+	}
+	return match, nil
+}
+
 func (mr MatchRepository) DeleteMatchWithUserId(id string) error {
 	filter := bson.M{"user_id": id}
 	collection := db.GetCollection(mr.mongoClient, "matches")
@@ -115,6 +136,21 @@ func (qr MatchRepository) UpdateMatch(questionId primitive.ObjectID, updateReque
 	filter := bson.M{"_id": questionId}
 	collection := db.GetCollection(qr.mongoClient, "matches")
 	update := bson.M{"$set": updateRequest}
+	_, err := collection.UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (mr MatchRepository) CancelMatch(cancelRequest model.CancelRequest) error {
+	filter := bson.M{"_id": cancelRequest.Id}
+	collection := db.GetCollection(mr.mongoClient, "matches")
+	update := bson.M{
+		"$set": bson.M{
+			"is_cancelled": true,
+		},
+	}
 	_, err := collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		return err

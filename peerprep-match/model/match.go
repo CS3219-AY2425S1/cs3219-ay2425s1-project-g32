@@ -45,12 +45,13 @@ func (m *MatchRequestMessage) UnmarshalJSON(data []byte) error {
 }
 
 type Match struct {
-	Id         primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"` // mongo uses _id in bson for their object id, json id is for our requests
-	UserId     string             `json:"user_id" bson:"user_id"`
-	Category   string             `json:"category"`
-	Complexity string             `json:"complexity"`
-	HasMatch   bool               `json:"has_match" bson:"has_match"`
-	CreatedAt  primitive.DateTime `json:"created_at" bson:"created_at"`
+	Id          primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"` // mongo uses _id in bson for their object id, json id is for our requests
+	UserId      string             `json:"user_id" bson:"user_id"`
+	Category    string             `json:"category"`
+	Complexity  string             `json:"complexity"`
+	HasMatch    bool               `json:"has_match" bson:"has_match"`
+	CreatedAt   primitive.DateTime `json:"created_at" bson:"created_at"`
+	IsCancelled bool               `json:"is_cancelled" bson:"is_cancelled"`
 }
 
 type UpdateMatchRequest struct {
@@ -58,6 +59,10 @@ type UpdateMatchRequest struct {
 	Category   string `json:"category"`
 	Complexity string `json:"complexity"`
 	HasMatch   bool   `json:"has_match" bson:"has_match"`
+}
+
+type CancelRequest struct {
+	Id string `json:"id"`
 }
 
 type GetMatchFilter struct {
