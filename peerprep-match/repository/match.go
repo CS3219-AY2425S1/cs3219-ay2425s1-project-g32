@@ -54,6 +54,8 @@ func (qr MatchRepository) GetPossibleMatchesForUser(userId string, filter model.
 	f["user_id"] = bson.M{"$ne": userId}
 	// Exclude matched rows as well
 	f["has_match"] = false
+	// Exclude cancelled rows
+	f["is_cancelled"] = false
 	// Calculate the timestamp for 5 minutes ago
 	fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
 	// Add filter for records created within the last 5 minutes
