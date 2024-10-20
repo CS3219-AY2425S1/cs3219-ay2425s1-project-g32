@@ -82,9 +82,7 @@ const FindMatchPage = () => {
       );
 
       setMatchRequestId(res.id);
-      if (!res.isNew) {
-        setDisplayHint(true);
-      }
+      setDisplayHint(!res.isNew);
     } catch (error) {
       setError('An error occurred while finding a match. Please try again.');
     }
@@ -182,12 +180,12 @@ const FindMatchPage = () => {
           <DialogFooter>
             <Button
               variant="destructive"
-              onClick={() => {
+              onClick={async () => {
                 if (!sessionData?.accessToken || !matchRequestId) {
                   return;
                 }
 
-                cancelMatch(matchRequestId, sessionData?.accessToken);
+                await cancelMatch(matchRequestId, sessionData?.accessToken);
                 if (pollIntervalId.current !== null) {
                   clearInterval(pollIntervalId.current);
                 }
