@@ -111,6 +111,7 @@ func (qr MatchRepository) GetActiveMatchWithUserId(userId string) (model.Match, 
 	fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
 	// Add filter for records created within the last 5 minutes
 	filter["created_at"] = bson.M{"$gte": fiveMinutesAgo}
+	filter["is_cancelled"] = true
 
 	collection := db.GetCollection(qr.mongoClient, "matches")
 
