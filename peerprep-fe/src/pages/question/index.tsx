@@ -4,6 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import CodeEditor from './codeEditor';
+
 const FormSchema = z.object({
   codeInput: z.string().min(1, 'Input your answer.'),
 });
@@ -62,16 +64,7 @@ export default function QuestionAnswerPage() {
       {/* Right Panel - Code Editor and Results */}
       <div className="ml-4 flex flex-1 flex-col rounded-md bg-white p-4 shadow-md">
         {/* Code Editor Section */}
-        <div className="mb-4 h-1/2">
-          <div
-            className="h-full w-full rounded border border-gray-300 p-2 font-mono text-sm"
-            contentEditable="true"
-            style={{ whiteSpace: 'pre-wrap' }}
-            onInput={(e) => setCodeInput(e.currentTarget.textContent || '')}
-          >
-            # Write your code here
-          </div>
-        </div>
+        <CodeEditor roomId="roomId" />
         {/* Submit Button */}
         <div className="mb-4 flex justify-end">
           <button

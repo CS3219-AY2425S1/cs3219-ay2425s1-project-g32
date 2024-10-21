@@ -80,3 +80,12 @@ export const SessionProvider: FC<PropsWithChildren> = ({ children }) => {
 };
 
 export const useSession = () => useContext(SessionContext);
+
+export const getTokenFromLocalStorage = (): string => {
+  const jwtCookie = getCookie('auth');
+  if (!jwtCookie) {
+    return '';
+  }
+  const jwt = JSON.parse(jwtCookie) as LocalStorageJWT;
+  return jwt.accessToken;
+};
