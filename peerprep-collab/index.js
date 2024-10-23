@@ -1,14 +1,16 @@
 import { createServer } from "http";
 import express, { json } from "express";
 import { WebSocketServer } from "ws";
-import authenticateToken from "./middleware/auth.js";
+import { authenticateToken, auth } from "./middleware/auth.js";
 import { onConnection } from "./controller/collab-controller.js";
+import collabRoutes from "./routes/collab-routes.js";
 import "dotenv/config";
 
 const app = express();
 const port = 1234;
 
 app.use(json());
+app.use(auth);
 const server = createServer(app);
 const wss = new WebSocketServer({ noServer: true });
 
@@ -31,6 +33,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/collab", collabRoutes);
+
 // Handle WebSocket upgrades
 server.on("upgrade", async (request, socket, head) => {
   // auth middelware
@@ -43,14 +47,12 @@ server.on("upgrade", async (request, socket, head) => {
   }
 
   const user = await authenticateToken(token);
-  console.log(user);
   if (!user) {
     socket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
     socket.destroy();
     return;
   }
 
-  console.log(token, user);
   wss.handleUpgrade(request, socket, head, (ws) => {
     wss.emit("connection", ws, request, user);
   });

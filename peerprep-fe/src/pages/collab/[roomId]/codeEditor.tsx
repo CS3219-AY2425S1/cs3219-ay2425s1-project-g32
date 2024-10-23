@@ -10,7 +10,7 @@ import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 
 import { useToast } from '@/components/ui/toast/use-toast';
-import { getTokenFromLocalStorage, useSession } from '@/context/useSession';
+import { useSession } from '@/context/useSession';
 
 const usercolors = [
   { color: '#30bced', light: '#30bced33' },
@@ -40,26 +40,31 @@ const CodeMirrorEditor: React.FC<CodeMirrorEditorProps> = ({ roomId }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const token = getTokenFromLocalStorage();
-    if (!token) return undefined;
-    const wsProvider = new WebsocketProvider('ws://localhost:1234', roomId, ydoc, {
-      protocols: [token],
-    });
+    if (!sessionData || !roomId) return;
+
+    const wsProvider = new WebsocketProvider(
+      process.env.NEXT_PUBLIC_COLLAB_SERVICE_WEBSOCKET_URL as string,
+      roomId,
+      ydoc,
+      {
+        protocols: [sessionData.accessToken],
+      }
+    );
 
     wsProvider.awareness.setLocalStateField('user', {
-      name: sessionData?.user.id || 'Anonymous',
+      name: sessionData?.user.id || 'Anonymouss',
       color: userColor.color,
       colorLight: userColor.light,
     });
 
     if (wsProvider.ws) {
-      wsProvider.ws.onclose = () => {
-        toast({ variant: 'destructive', description: "You're not allowed in this room." });
-        router.push('/');
+      wsProvider.ws.onclose = (event) => {
+        console.log(event);
+        toast({ variant: 'destructive', description: "Yous're not allowed in this room." });
+        // router.push('/');
       };
+      setProvider(wsProvider);
     }
-
-    setProvider(wsProvider);
 
     // Initialize the editor only after the component is mounted
     if (editorContainerRef.current) {
@@ -78,14 +83,13 @@ const CodeMirrorEditor: React.FC<CodeMirrorEditorProps> = ({ roomId }) => {
         parent: editorContainerRef.current,
       });
 
+      // eslint-disable-next-line consistent-return
       return () => {
         wsProvider.disconnect();
         view.destroy();
       };
     }
-
-    return undefined;
-  }, [editorContainerRef, ydoc, ytext]);
+  }, [editorContainerRef, roomId, sessionData, toast, ydoc, ytext]);
 
   return (
     <div

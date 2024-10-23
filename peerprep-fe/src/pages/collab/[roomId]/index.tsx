@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { useRouter } from 'next/router';
+
+import { Button } from '@/components/ui/button';
+import Skeleton from '@/components/ui/skeleton';
 
 import CodeEditor from './codeEditor';
 
-const FormSchema = z.object({
-  codeInput: z.string().min(1, 'Input your answer.'),
-});
-
 export default function QuestionAnswerPage() {
-  /* eslint-disable-next-line no-unused-vars */
-  const [_, setCodeInput] = useState('');
   const [activeTab, setActiveTab] = useState('testCases'); // State to handle tab switching
+  const router = useRouter();
+  const { roomId } = router.query;
 
   const question = {
     title: 'Question Title',
@@ -36,49 +33,34 @@ export default function QuestionAnswerPage() {
     },
   ];
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      codeInput: '',
-    },
-  });
-
-  const onSubmit = () => {
-    console.log(form.getValues('codeInput'));
-  };
-
   return (
-    <div className="flex h-screen bg-gray-100 p-4">
-      {/* Left Panel - Problem Statement */}
-      <div className="w-1/3 rounded-md bg-white p-4 shadow-md">
+    <div className="flex flex-grow gap-x-4 bg-gray-100 p-4">
+      <div className="w-[450px] rounded-md bg-white p-4 shadow-md">
         <div className="mb-2 text-2xl font-bold">{question.title}</div>
         <div className="mb-4 text-gray-600">{question.description}</div>
-
-        {/* Graph / Visual Representation */}
         <div className="mb-4 flex h-40 items-center justify-center rounded border border-gray-300 p-4">
-          {/* Placeholder for Graph */}
           <div>Graph Visualization Placeholder</div>
         </div>
       </div>
-
-      {/* Right Panel - Code Editor and Results */}
-      <div className="ml-4 flex flex-1 flex-col rounded-md bg-white p-4 shadow-md">
-        {/* Code Editor Section */}
-        <CodeEditor roomId="roomId" />
-        {/* Submit Button */}
-        <div className="mb-4 flex justify-end">
-          <button
-            type="button"
-            onClick={onSubmit}
-            className="cursor-pointer rounded bg-blue-500 px-4 py-2 text-white transition hover:bg-blue-600"
-          >
-            Run Code
-          </button>
+      <div className="col-span-auto flex-grow  overflow-scroll rounded-md bg-white p-4 shadow-md">
+        <div className="mb-6">
+          {!roomId ? (
+            <div className="flex flex-col gap-y-4">
+              <Skeleton className="h-4 w-1/2" />
+              {[...Array.from<number>({ length: 8 })]
+                .map((_, i) => i)
+                .map((v: number) => (
+                  <Skeleton key={v} className="h-4" />
+                ))}
+            </div>
+          ) : (
+            <CodeEditor roomId={roomId as string} />
+          )}
+          <div className="mt-4 flex justify-end">
+            <Button>Run Code</Button>
+          </div>
         </div>
-
-        {/* Test Cases and Test Results Section */}
-        <div className="h-1/2 rounded bg-gray-50 p-4">
-          {/* Tabs */}
+        <div className="rounded bg-gray-50 p-4">
           <div className="mb-2 flex">
             <button
               type="button"
@@ -99,11 +81,8 @@ export default function QuestionAnswerPage() {
               Test Result
             </button>
           </div>
-
-          {/* Tab Content */}
           {activeTab === 'testCases' ? (
             <div>
-              {/* Test Cases Content */}
               {testCases.map((testCase) => (
                 <div key={testCase.id} className="mb-2 rounded border p-4">
                   <div className="font-semibold">{testCase.description}</div>
@@ -120,7 +99,6 @@ export default function QuestionAnswerPage() {
             </div>
           ) : (
             <div>
-              {/* Test Result Content */}
               <div className="rounded border p-4">
                 <div className="font-semibold">Test Output</div>
                 <div>Output for the current test cases will be shown here...</div>
