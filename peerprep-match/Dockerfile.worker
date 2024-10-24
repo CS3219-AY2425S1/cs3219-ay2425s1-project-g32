@@ -1,0 +1,10 @@
+FROM golang:1.22-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Go application code into the container
+COPY . .
+
+# Command to run the Go app when the container starts
+CMD ["go", "run", "worker/main.go"]

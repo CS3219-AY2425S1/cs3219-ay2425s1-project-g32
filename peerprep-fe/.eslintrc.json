@@ -1,0 +1,108 @@
+{
+  "overrides": [
+    {
+      "extends": ["plugin:@typescript-eslint/recommended-requiring-type-checking"],
+      "files": ["*.ts", "*.tsx"],
+      "parserOptions": {
+        "project": "tsconfig.json"
+      },
+      "rules": {
+        "@typescript-eslint/no-floating-promises": "off"
+      }
+    }
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint"],
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "airbnb",
+    "plugin:prettier/recommended"
+  ],
+  "rules": {
+    "@typescript-eslint/consistent-type-imports": [
+      "warn",
+      {
+        "prefer": "type-imports",
+        "fixStyle": "inline-type-imports"
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "import/order": [
+      "error",
+      {
+        "warnOnUnassignedImports": true,
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
+          "object",
+          "type"
+        ],
+        "alphabetize": {
+          "order": "asc"
+        },
+        "newlines-between": "always",
+        "pathGroupsExcludedImportTypes": ["react"],
+        "distinctGroup": false,
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "builtin"
+          }
+        ]
+      }
+    ],
+    "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }], // Allow for jsx in typescript files
+    "react/function-component-definition": [
+      // Allow for arrow-functions
+      2,
+      { "namedComponents": ["arrow-function", "function-declaration"] }
+    ],
+    "react/react-in-jsx-scope": "off", // to prevent import of React in every component,
+    "no-void": "off",
+    "comma-dangle": [
+      // Trailing commas
+      1,
+      {
+        "imports": "only-multiline",
+        "exports": "only-multiline",
+        "objects": "always-multiline",
+        "arrays": "only-multiline",
+        "functions": "never"
+      }
+    ],
+    "react/jsx-props-no-spreading": "off", // Allow for props spreading into components,
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }], // Allow import from devDependencies
+    "no-param-reassign": 0,
+    "@typescript-eslint/no-misused-promises": [
+      // Allow for non-promise return https://github.com/orgs/react-hook-form/discussions/8622
+      2,
+      {
+        "checksVoidReturn": {
+          "attributes": false
+        }
+      }
+    ],
+    "react/prop-types": "off",
+    "react/require-default-props": "off", // Disable requirement for default props for optional fields
+    "jsx-a11y/label-has-associated-control": "off", // Disable due to bug where it seems to not sense id placed on Input component
+    "no-shadow": "off" // Prevent eslint errors when using enums
+  }
+}
