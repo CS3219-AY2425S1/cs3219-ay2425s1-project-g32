@@ -10,16 +10,17 @@ export const onConnection = (ws, req, user) => {
   // If room not created yet, reject this connection
   const room = {};
   if (!room) {
+    console.log("Invalid room");
     ws.emit("close");
     return;
   }
 
   // If created, check if the current user is supposed to be in this room
   if (!userInRoom(user.id, room)) {
+    console.log("User not ssupposed to be in room");
     ws.emit("close");
     return;
   }
-
   setupWSConnection(ws, req, { docName });
 
   console.log(`User ${user.id} connected to document: ${docName}`);

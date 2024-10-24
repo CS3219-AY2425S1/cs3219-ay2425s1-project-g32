@@ -1,14 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { python } from '@codemirror/lang-python';
-import { EditorState } from '@codemirror/state';
-import { EditorView, keymap } from '@codemirror/view';
-import { basicSetup } from 'codemirror';
-import { useRouter } from 'next/router';
-import { yCollab, yUndoManagerKeymap } from 'y-codemirror.next';
+// import { useRouter } from 'next/router';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 
+import CodeEditor from '@/components/codeEditor';
 import { useToast } from '@/components/ui/toast/use-toast';
 import { useSession } from '@/context/useSession';
 
@@ -27,16 +23,16 @@ const userColor = usercolors[Math.floor(Math.random() * usercolors.length)];
 
 interface CodeMirrorEditorProps {
   roomId: string;
+  language: string;
+  theme: string;
 }
 
-const CodeMirrorEditor: React.FC<CodeMirrorEditorProps> = ({ roomId }) => {
-  const editorContainerRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line no-unused-vars
+const CodeMirrorEditor: React.FC<CodeMirrorEditorProps> = ({ roomId, language, theme }) => {
   const [provider, setProvider] = useState<WebsocketProvider | null>(null);
   const [ydoc] = useState(() => new Y.Doc());
   const [ytext] = useState(() => ydoc.getText('codemirror'));
   const { sessionData } = useSession();
-  const router = useRouter();
+  // const router = useRouter();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -64,38 +60,21 @@ const CodeMirrorEditor: React.FC<CodeMirrorEditorProps> = ({ roomId }) => {
         // router.push('/');
       };
       setProvider(wsProvider);
+    } else {
+      console.log('Seomthing wrong seems to be happening');
     }
-
-    // Initialize the editor only after the component is mounted
-    if (editorContainerRef.current) {
-      const state = EditorState.create({
-        doc: ytext.toString(),
-        extensions: [
-          keymap.of([...yUndoManagerKeymap]),
-          basicSetup,
-          python(),
-          yCollab(ytext, wsProvider.awareness),
-        ],
-      });
-
-      const view = new EditorView({
-        state,
-        parent: editorContainerRef.current,
-      });
-
-      // eslint-disable-next-line consistent-return
-      return () => {
-        wsProvider.disconnect();
-        view.destroy();
-      };
-    }
-  }, [editorContainerRef, roomId, sessionData, toast, ydoc, ytext]);
+  }, [roomId, sessionData, toast, ydoc, ytext]);
 
   return (
-    <div
-      ref={editorContainerRef}
-      style={{ height: '400px', overflow: 'scroll', border: '1px solid lightgray' }}
-    />
+    provider && (
+      <CodeEditor
+        theme={theme}
+        websocketProvider={provider}
+        ytext={ytext}
+        language={language}
+        editorSettings={undefined}
+      />
+    )
   );
 };
 
