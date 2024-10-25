@@ -77,7 +77,7 @@ func (qc QuestionController) UpdateQuestion(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err := qc.questionRepository.UpdateQuestion(id, updateRequest)
+	question, err := qc.questionRepository.UpdateQuestion(id, updateRequest)
 	if err != nil {
 		if errors.Is(err, model.InvalidInputError{}) {
 			log.Printf("Invalid input error: %v", err)
@@ -89,6 +89,7 @@ func (qc QuestionController) UpdateQuestion(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(*question)
 }
 
 func (qc QuestionController) DeleteQuestion(w http.ResponseWriter, r *http.Request) {

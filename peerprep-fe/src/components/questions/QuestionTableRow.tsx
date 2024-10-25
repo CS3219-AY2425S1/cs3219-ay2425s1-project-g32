@@ -10,10 +10,12 @@ import {
 } from '@/components/ui/table';
 import { type Question } from '@/types/question';
 import Label from '@/components/ui/label';
+import EditQuestionModal from './EditQuestionModal';
 
 interface QuestionTableRowProps {
   question: Question;
   onDelete: (id: string) => void;
+  onEdit: (id: string, values: Omit<Question, 'id'>) => Promise<void>;
 }
 
 const Difficulty = ({ difficulty }: { difficulty: string }) => {
@@ -34,7 +36,7 @@ const Difficulty = ({ difficulty }: { difficulty: string }) => {
   return <div className={className}>{difficulty}</div>;
 };
 
-const QuestionTableRow: React.FC<QuestionTableRowProps> = ({ question, onDelete }) => {
+const QuestionTableRow: React.FC<QuestionTableRowProps> = ({ question, onDelete, onEdit }) => {
   return (
     <TableRow key={question.id}>
       <TableCell className="w-[200px] font-medium">{question.title}</TableCell>
@@ -53,9 +55,7 @@ const QuestionTableRow: React.FC<QuestionTableRowProps> = ({ question, onDelete 
       </TableCell>
       <TableCell>
         <div className="flex space-x-4">
-          <Label className="cursor-pointer text-yellow-600" onClick={() => {}}>
-            Edit
-          </Label>
+          <EditQuestionModal question={question} onEdit={onEdit} />
           <Label className="cursor-pointer text-red-500" onClick={() => onDelete(question.id)}>
             Delete
           </Label>

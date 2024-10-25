@@ -67,6 +67,35 @@ const QuestionsPage = () => {
     }
   };
 
+  const handleEdit = async (id: string, values: Omit<Question, 'id'>) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_QUESTIONS_BACKEND_URL || ''}/question/${id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(values),
+        }
+      );
+
+      if (response.ok) {
+        const newQuestion = await response.json();
+        setQuestions((prevQuestions) =>
+          prevQuestions.map((question) => (question.id === newQuestion.id ? newQuestion : question))
+        );
+        toast({ description: 'Question updated successfully' });
+      } else {
+        console.error('Failed to update question');
+        toast({ variant: 'destructive', description: 'Error updating question' });
+      }
+    } catch (error) {
+      console.error('Error updating question:', error);
+      toast({ variant: 'destructive', description: 'Error updating question' });
+    }
+  };
+
   const handleSubmit = async (values: Omit<Question, 'id'>) => {
     try {
       const response = await fetch(
@@ -116,7 +145,12 @@ const QuestionsPage = () => {
             </TableHeader>
             <TableBody>
               {questions.map((question) => (
-                <QuestionTableRow key={question.id} question={question} onDelete={handleDelete} />
+                <QuestionTableRow
+                  key={question.id}
+                  question={question}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                />
               ))}
             </TableBody>
           </Table>
