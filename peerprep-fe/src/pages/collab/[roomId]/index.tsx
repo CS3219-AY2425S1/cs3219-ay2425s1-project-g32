@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 
 import { Role } from '@/types/user';
 
+import Chat from './chat';
 import CodeAndSubmit from './codeAndSubmit';
 
 const CollabPage = () => {
@@ -18,12 +19,13 @@ const CollabPage = () => {
 
   return (
     <div className="flex flex-grow gap-x-4 overflow-hidden bg-gray-100 p-4">
-      <div className="w-[450px] rounded-md bg-white p-4 shadow-md">
+      <div className="w-[450px] overflow-scroll rounded-md bg-white p-4 shadow-md">
         <div className="mb-2 text-2xl font-bold">{question.title}</div>
         <div className="mb-4 text-gray-600">{question.description}</div>
         <div className="mb-4 flex h-40 items-center justify-center rounded border border-gray-300 p-4">
           <div>Graph Visualization Placeholder</div>
         </div>
+        <Chat />
       </div>
       <CodeAndSubmit roomId={roomId as string} />
     </div>
