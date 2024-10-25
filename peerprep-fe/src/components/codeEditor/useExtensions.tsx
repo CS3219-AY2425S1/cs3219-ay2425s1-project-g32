@@ -13,6 +13,7 @@ import useMatchBrackets from './useMatchBrackets';
 import useThemeExtension from './useThemesExtension';
 
 import type { CodeEditorProps } from '.';
+import type { Extension } from '@codemirror/state';
 import type { EditorView } from 'codemirror';
 
 const useExtensions = (props: CodeEditorProps, editorView: EditorView | null) => {
@@ -43,7 +44,7 @@ const useExtensions = (props: CodeEditorProps, editorView: EditorView | null) =>
     autocompleteExtension,
   ]);
 
-  return extensionsRef.current;
+  return extensionsRef.current as Extension;
 };
 
 export default useExtensions;
