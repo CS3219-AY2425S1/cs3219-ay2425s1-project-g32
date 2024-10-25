@@ -1,7 +1,4 @@
-'use client';
-
 import { useEffect, useLayoutEffect, useState } from 'react';
-
 import { Badge } from '@/components/ui/badge';
 import Skeleton from '@/components/ui/skeleton';
 import {
@@ -15,55 +12,94 @@ import {
 import { useToast } from '@/components/ui/toast/use-toast';
 import { type Question } from '@/types/question';
 import { Role } from '@/types/user';
+import Label from '@/components/ui/label';
 import { api } from '@/utils/api';
+import QuestionTableRow from '@/components/questions/QuestionTableRow';
+import { Button } from '@/components/ui/button';
+import CreateQuestionModal from '@/components/questions/CreateQuestionModal';
 
-const Difficulty = ({ difficulty }: { difficulty: string }) => {
-  let className = '';
-  switch (difficulty) {
-    case 'Easy':
-      className = 'text-green-600';
-      break;
-    case 'Medium':
-      className = 'text-orange-500';
-      break;
-    case 'Hard':
-      className = 'text-red-600';
-      break;
-    default:
-      break;
-  }
-  return <div className={className}>{difficulty}</div>;
-};
 const QuestionsPage = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // To fix hydration issue with shadcn table: https://github.com/shadcn-ui/ui/issues/1577
   useLayoutEffect(() => {
     setIsMounted(true);
   }, []);
 
+  const fetchQuestions = async () => {
+    setLoading(true);
+    try {
+      const data = await api<Question[]>(
+        `${process.env.NEXT_PUBLIC_QUESTIONS_BACKEND_URL || ''}/question`
+      );
+      setQuestions(data);
+    } catch (e) {
+      toast({ variant: 'destructive', description: 'Error fetching questions' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        const data = await api<Question[]>(
-          `${process.env.NEXT_PUBLIC_QUESTIONS_BACKEND_URL || ''}/question`
-        );
-        setQuestions(data);
-      } catch (e) {
-        toast({ variant: 'destructive', description: 'Error fetching questions' });
-      } finally {
-        setLoading(false);
-      }
-    })();
+    fetchQuestions();
   }, [toast]);
+
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_QUESTIONS_BACKEND_URL || ''}/question/${id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+      if (response.ok) {
+        setQuestions((prevQuestions) => prevQuestions.filter((q) => q.id !== id));
+        toast({ description: 'Question deleted successfully' });
+      } else {
+        console.error('Failed to delete question');
+        toast({ variant: 'destructive', description: 'Error deleting question' });
+      }
+    } catch (error) {
+      console.error('Error deleting question:', error);
+      toast({ variant: 'destructive', description: 'Error deleting question' });
+    }
+  };
+
+  const handleSubmit = async (values: Omit<Question, 'id'>) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_QUESTIONS_BACKEND_URL || ''}/question`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(values),
+        }
+      );
+
+      if (response.ok) {
+        const newQuestion = await response.json();
+        setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
+        toast({ description: 'Question created successfully' });
+      } else {
+        console.error('Failed to create question');
+        toast({ variant: 'destructive', description: 'Error creating question' });
+      }
+    } catch (error) {
+      console.error('Error creating question:', error);
+      toast({ variant: 'destructive', description: 'Error creating question' });
+    }
+  };
 
   return (
     <div className="layout my-4">
-      <h1 className="mb-8 text-xl font-medium">Questions</h1>
+      <div className="flex justify-between">
+        <h1 className="mb-8 text-xl font-medium">Questions</h1>
+        <CreateQuestionModal onSubmit={handleSubmit} />
+      </div>
       <div>
         <div className="mb-6">Filters</div>
         {!isMounted || loading ? (
@@ -80,22 +116,7 @@ const QuestionsPage = () => {
             </TableHeader>
             <TableBody>
               {questions.map((question) => (
-                <TableRow key={question.id}>
-                  <TableCell className="w-[200px] font-medium">{question.title}</TableCell>
-                  <TableCell className="whitespace-pre-wrap">{question.description}</TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-2">
-                      {question.category.map((c) => (
-                        <Badge className="whitespace-nowrap" key={c}>
-                          {c}
-                        </Badge>
-                      ))}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Difficulty difficulty={question.complexity} />
-                  </TableCell>
-                </TableRow>
+                <QuestionTableRow key={question.id} question={question} onDelete={handleDelete} />
               ))}
             </TableBody>
           </Table>

@@ -40,6 +40,7 @@
     "cmdk": "^1.0.0",
     "codemirror": "^6.0.1",
     "cookies-next": "^4.2.1",
+    "formik": "^2.4.6",
     "husky": "^9.1.6",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.445.0",
@@ -53,6 +54,7 @@
     "y-codemirror.next": "^0.3.5",
     "y-websocket": "^2.0.4",
     "yjs": "^13.6.20",
+    "yup": "^1.4.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
