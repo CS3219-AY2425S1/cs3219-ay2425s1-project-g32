@@ -25,15 +25,33 @@ interface CodeMirrorEditorProps {
   roomId: string;
   language: string;
   theme: string;
+  onCodeChange: (code: string) => void;
 }
 
-const CodeMirrorEditor: React.FC<CodeMirrorEditorProps> = ({ roomId, language, theme }) => {
+const CodeMirrorEditor: React.FC<CodeMirrorEditorProps> = ({
+  roomId,
+  language,
+  theme,
+  onCodeChange,
+}) => {
   const [provider, setProvider] = useState<WebsocketProvider | null>(null);
   const [ydoc] = useState(() => new Y.Doc());
   const [ytext] = useState(() => ydoc.getText('codemirror'));
   const { sessionData } = useSession();
   // const router = useRouter();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const updateCode = () => {
+      onCodeChange(ytext.toString());
+    };
+
+    ytext.observe(updateCode);
+
+    return () => {
+      ytext.unobserve(updateCode);
+    };
+  }, [onCodeChange, ytext]);
 
   useEffect(() => {
     if (!sessionData || !roomId) return;

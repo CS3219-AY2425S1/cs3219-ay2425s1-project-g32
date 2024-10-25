@@ -44,6 +44,11 @@ const CodeAndSubmit: FC<Props> = ({ roomId }) => {
     () => Object.values(EXECUTABLE_LANGUAGES).includes(language),
     [language]
   );
+  const [code, setCode] = useState<string>(''); // State to hold the code
+
+  const handleRunCode = () => {
+    console.log('Running Code:', code, language);
+  };
 
   return (
     <div className="flex flex-grow flex-col">
@@ -95,12 +100,12 @@ const CodeAndSubmit: FC<Props> = ({ roomId }) => {
           </div>
         ) : (
           <div className="flex-grow overflow-hidden rounded-lg">
-            <CodeEditor roomId={roomId} language={language} theme={theme} />
+            <CodeEditor roomId={roomId} language={language} theme={theme} onCodeChange={setCode} />
           </div>
         )}
         {executable && (
           <div className="mt-4 flex justify-end">
-            <Button>Run Code</Button>
+            <Button onClick={handleRunCode}>Run Code</Button>
           </div>
         )}
       </div>
