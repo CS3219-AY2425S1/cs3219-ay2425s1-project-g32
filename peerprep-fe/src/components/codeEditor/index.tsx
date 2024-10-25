@@ -15,7 +15,7 @@ export interface CodeEditorProps {
 
 const CodeEditor: FC<CodeEditorProps> = (props) => {
   const cmProps = useCodeEditor(props);
-  return <div key="codemirror-6-instance" style={{ height: 300 }} {...cmProps} />;
+  return <div key="codemirror-6-instance" style={{ height: '100%' }} {...cmProps} />;
 };
 
 export default CodeEditor;

@@ -17,7 +17,7 @@ const CollabPage = () => {
   };
 
   return (
-    <div className="flex flex-grow gap-x-4 bg-gray-100 p-4">
+    <div className="flex flex-grow gap-x-4 overflow-hidden bg-gray-100 p-4">
       <div className="w-[450px] rounded-md bg-white p-4 shadow-md">
         <div className="mb-2 text-2xl font-bold">{question.title}</div>
         <div className="mb-4 text-gray-600">{question.description}</div>

@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 export const LANGUAGES: Record<string, string> = {
   CPP: 'C++',
   C: 'C',
@@ -10,4 +9,8 @@ export const LANGUAGES: Record<string, string> = {
   JAVASCRIPT: 'Javascript',
   TYPESCRIPT: 'Typescript',
   GO: 'Go',
+};
+
+export const EXECUTABLE_LANGUAGES: Record<string, string> = {
+  JAVASCRIPT: 'JAVASCRIPT',
 };
