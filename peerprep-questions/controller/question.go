@@ -34,12 +34,12 @@ func (qc QuestionController) CreateQuestion(w http.ResponseWriter, r *http.Reque
 
 	// Set to DB
 	result, err := qc.questionRepository.CreateQuestion(question)
-	
+
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
 			http.Error(w, "A question with this title already exists", http.StatusConflict)
 			return
-        }
+		}
 		log.Printf("Error creating question")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -72,8 +72,8 @@ func (qc QuestionController) UpdateQuestion(w http.ResponseWriter, r *http.Reque
 	// parse request body into update request
 	updateRequest := model.UpdateQuestionRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&updateRequest); err != nil {
-		log.Printf("Invalid input error: %v", err)
-		http.Error(w, "Invalid input", http.StatusBadRequest)
+		log.Printf("Incorrect question format error: %v", err)
+		http.Error(w, "Incorrect question format", http.StatusBadRequest)
 		return
 	}
 
