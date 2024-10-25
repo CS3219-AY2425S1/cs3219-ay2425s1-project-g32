@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import { cn } from '@/utils/tailwind';
 
 interface ModalProps {
@@ -20,6 +21,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
     >
       <div className="relative mx-4 w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
         <button
+          type="button"
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-600 hover:text-gray-800"
           aria-label="Close"

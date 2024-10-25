@@ -1,15 +1,8 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import {
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  Table,
-  TableCell,
-} from '@/components/ui/table';
-import { type Question } from '@/types/question';
 import Label from '@/components/ui/label';
+import { TableRow, TableCell } from '@/components/ui/table';
+import { type Question } from '@/types/question';
+
 import EditQuestionModal from './EditQuestionModal';
 
 interface QuestionTableRowProps {

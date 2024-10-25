@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
+
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup'; // For validation schema
+import * as Yup from 'yup';
+
+import { Button } from '@/components/ui/button';
+import Label from '@/components/ui/label';
 import { Question } from '@/types/question';
-import Label from '../ui/label';
-import { Button } from '../ui/button';
 
 interface EditQuestionFormProps {
   question: Question;

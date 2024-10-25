@@ -1,7 +1,9 @@
-import { useEffect, useLayoutEffect, useState } from 'react';
-import { type Question } from '@/types/question';
-import Modal from '@/components/ui/modal';
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
+import Modal from '@/components/ui/modal';
+import { type Question } from '@/types/question';
+
 import CreateQuestionForm from './CreateQuestionForm';
 
 interface CreateQuestionModalProps {

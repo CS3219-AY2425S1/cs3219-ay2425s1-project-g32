@@ -1,22 +1,13 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { Badge } from '@/components/ui/badge';
+
+import CreateQuestionModal from '@/components/questions/CreateQuestionModal';
+import QuestionTableRow from '@/components/questions/QuestionTableRow';
 import Skeleton from '@/components/ui/skeleton';
-import {
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  Table,
-  TableCell,
-} from '@/components/ui/table';
+import { TableHeader, TableRow, TableHead, TableBody, Table } from '@/components/ui/table';
 import { useToast } from '@/components/ui/toast/use-toast';
 import { type Question } from '@/types/question';
 import { Role } from '@/types/user';
-import Label from '@/components/ui/label';
 import { api } from '@/utils/api';
-import QuestionTableRow from '@/components/questions/QuestionTableRow';
-import { Button } from '@/components/ui/button';
-import CreateQuestionModal from '@/components/questions/CreateQuestionModal';
 
 const QuestionsPage = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -81,7 +72,7 @@ const QuestionsPage = () => {
       );
 
       if (response.ok) {
-        const newQuestion = await response.json();
+        const newQuestion = (await response.json()) as Question;
         setQuestions((prevQuestions) =>
           prevQuestions.map((question) => (question.id === newQuestion.id ? newQuestion : question))
         );
@@ -110,7 +101,7 @@ const QuestionsPage = () => {
       );
 
       if (response.ok) {
-        const newQuestion = await response.json();
+        const newQuestion = (await response.json()) as Question;
         setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
         toast({ description: 'Question created successfully' });
       } else {
