@@ -6,6 +6,7 @@ import { yCollab, yUndoManagerKeymap } from 'y-codemirror.next';
 import useAutocomplete from './useAutocomplete';
 import useCodeFolding from './useCodeFolding';
 import { defaultExtensions } from './useDefaultExtensions';
+import useIndentation from './useIndentation';
 import useLanguageExtension from './useLanguageExtension';
 import useLineNumbers from './useLineNumbers';
 import useLineWrapping from './useLineWrapping';
@@ -24,6 +25,7 @@ const useExtensions = (props: CodeEditorProps, editorView: EditorView | null) =>
   const lineWrappingExtension = useLineWrapping(editorView);
   const codeFoldingExtension = useCodeFolding(editorView);
   const autocompleteExtension = useAutocomplete(editorView);
+  const indentationExetension = useIndentation(editorView);
 
   // console.log("useExtensions", editorSettings);
 
@@ -42,6 +44,7 @@ const useExtensions = (props: CodeEditorProps, editorView: EditorView | null) =>
     lineWrappingExtension,
     codeFoldingExtension,
     autocompleteExtension,
+    indentationExetension,
   ]);
 
   return extensionsRef.current as Extension;
