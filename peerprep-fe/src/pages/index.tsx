@@ -1,15 +1,29 @@
+import { useEffect, useState } from 'react';
+
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/context/useSession';
 
+import Backdrop from './backdrop';
+
 export default function Home() {
   const { sessionData } = useSession();
+  const [mounted, setMounted] = useState(true);
+  const { resolvedTheme: theme } = useTheme();
+
+  useEffect(() => {
+    if (theme) {
+      setMounted(false);
+    }
+  }, [theme]);
 
   return (
     <div className="layout">
+      <Backdrop className="left-12 dark:lg:left-[35rem]" />
       <div className="flex flex-col items-start gap-2 px-4 py-8">
         <h1 className="text-3xl font-bold">PeerPrep</h1>
         <p className="text-lg font-light text-foreground">
@@ -29,7 +43,16 @@ export default function Home() {
         </div>
       </div>
       <div className="overflow-hidden rounded-lg border bg-background shadow">
-        <Image src="/editor.png" alt="Code editor page" width={1600} height={800} />
+        {mounted ? (
+          <div className="h-[800px] w-[1600px] bg-muted" />
+        ) : (
+          <Image
+            src={theme === 'dark' ? '/editor.png' : '/editor-light.png'}
+            alt="Code editor page"
+            width={1600}
+            height={800}
+          />
+        )}
       </div>
       <div className="py-6">
         <p className="text-balance text-sm leading-loose text-muted-foreground">

@@ -7,6 +7,7 @@ import AuthGuard, { type AuthEnabledComponentConfig } from '@/components/authGua
 import Header from '@/components/header';
 import Toaster from '@/components/ui/toast/toaster';
 import { SessionProvider } from '@/context/useSession';
+import ThemeProvider from '@/context/useTheme';
 import '@/styles/globals.css';
 import { cn } from '@/utils/tailwind';
 
@@ -33,25 +34,27 @@ export default function App({ Component, ...pageProps }: AppAuthProps) {
   }, [router.pathname]);
 
   return (
-    <SessionProvider>
-      <div className="flex min-h-screen flex-col">
-        {router.pathname.slice(1) !== 'collab/[roomId]' && <Header />}
-        <main
-          className={cn(
-            inter.variable,
-            'relative flex flex-grow flex-col overflow-hidden font-sans'
-          )}
-        >
-          {Component.authenticationEnabled ? (
-            <AuthGuard config={Component.authenticationEnabled}>
+    <ThemeProvider attribute="class" enableSystem defaultTheme="system">
+      <SessionProvider>
+        <div className="flex min-h-screen flex-col">
+          {router.pathname.slice(1) !== 'collab/[roomId]' && <Header />}
+          <main
+            className={cn(
+              inter.variable,
+              'relative flex flex-grow flex-col overflow-hidden font-sans'
+            )}
+          >
+            {Component.authenticationEnabled ? (
+              <AuthGuard config={Component.authenticationEnabled}>
+                <Component {...pageProps} />
+              </AuthGuard>
+            ) : (
               <Component {...pageProps} />
-            </AuthGuard>
-          ) : (
-            <Component {...pageProps} />
-          )}
-        </main>
-      </div>
-      <Toaster />
-    </SessionProvider>
+            )}
+          </main>
+        </div>
+        <Toaster />
+      </SessionProvider>
+    </ThemeProvider>
   );
 }

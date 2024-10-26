@@ -6,6 +6,7 @@ import Peer from 'peerjs';
 
 import { Button } from '@/components/ui/button';
 import Loading from '@/components/ui/loading/loading';
+import Separator from '@/components/ui/separator';
 import { useToast } from '@/components/ui/toast/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSession } from '@/context/useSession';
@@ -162,14 +163,14 @@ const Chat = () => {
       </div>
       <div className="flex flex-col gap-y-5">
         <div className="flex flex-col gap-y-2">
-          <div className="text-sm font-medium text-foreground">
+          <div className="text-sm font-medium text-muted-foreground">
             username: <strong>{sessionData?.user.username}</strong>
           </div>
           <Video stream={myVideoStream} state={myVideoState} />
         </div>
-        <div className="h-[1px] w-full bg-gray-300" />
+        <Separator />
         <div className="flex flex-col gap-y-2">
-          <div className="text-sm font-medium text-foreground">
+          <div className="text-sm font-medium text-muted-foreground">
             username: <strong>{otherUser?.username || 'Not in room'}</strong>
           </div>
           <Video stream={otherVideoStream} state={otherVideoState} />

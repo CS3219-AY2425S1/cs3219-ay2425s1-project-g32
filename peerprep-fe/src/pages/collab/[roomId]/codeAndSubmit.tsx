@@ -1,6 +1,7 @@
 import { useMemo, useState, type FC } from 'react';
 
 import { InfoIcon } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 import { runCode } from '@/api/code';
 import { LANGUAGES, EXECUTABLE_LANGUAGES } from '@/components/codeEditor/data/languages';
@@ -15,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSession } from '@/context/useSession';
 
@@ -49,10 +51,13 @@ const formatOutput = (text: string) => {
 };
 
 const CodeAndSubmit: FC<Props> = () => {
+  const { resolvedTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('testCases'); // State to handle tab switching
   const [isCodeRunning, setIsCodeRunning] = useState<boolean>(false);
   const [language, setLanguage] = useState<string>(LANGUAGES.PYTHON);
-  const [theme, setTheme] = useState<string>(THEMES.SOLARIZED_LIGHT);
+  const [theme, setTheme] = useState<string>(
+    resolvedTheme === 'dark' ? THEMES.SOLARIZED_DARK : THEMES.SOLARIZED_LIGHT
+  );
   const [code, setCode] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [output, setOutput] = useState<string>('');
@@ -82,8 +87,8 @@ const CodeAndSubmit: FC<Props> = () => {
   };
 
   return (
-    <div className="flex flex-grow flex-col bg-gray-50 p-4">
-      <div className="flex flex-grow flex-col overflow-hidden rounded-lg bg-white p-4 shadow-md">
+    <div className="flex flex-grow flex-col bg-muted/50 p-4">
+      <div className="flex flex-grow flex-col overflow-hidden rounded-lg border bg-background p-4 shadow-md">
         <div className="mb-4 flex justify-between">
           <div className="flex items-center gap-x-2">
             <SidebarTrigger className="text-gray-500" />
@@ -132,62 +137,55 @@ const CodeAndSubmit: FC<Props> = () => {
         )}
       </div>
       {executable && (
-        <div className="mt-6 rounded-lg bg-white p-4 shadow-md">
-          <div className="rounded bg-gray-50 p-4">
-            <div className="mb-2 flex">
-              <button
-                type="button"
-                onClick={() => setActiveTab('testCases')}
-                className={`mr-2 cursor-pointer rounded px-4 py-2 ${
-                  activeTab === 'testCases' ? 'bg-gray-300' : ''
-                }`}
-              >
-                Test Cases
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('testResult')}
-                className={`cursor-pointer rounded px-4 py-2 ${
-                  activeTab === 'testResult' ? 'bg-gray-300' : ''
-                }`}
-              >
-                Test Result
-              </button>
-            </div>
-            {activeTab === 'testCases' ? (
-              <div>
-                {testCases.map((testCase) => (
-                  <div key={testCase.id} className="mb-2 rounded border p-4">
-                    <div className="font-semibold">{testCase.description}</div>
-                    <div>
-                      <div className="font-medium">Inputs:</div> x = {testCase.inputs.x}, y ={' '}
-                      {testCase.inputs.y}, nums = [{testCase.inputs.nums.join(', ')}]
+        <div className="mt-6 rounded-lg border bg-background p-4 shadow-md">
+          <div className="rounded  p-4">
+            <Tabs
+              value={activeTab}
+              onValueChange={(e) => {
+                setActiveTab(e);
+              }}
+              defaultValue="testCases"
+            >
+              <TabsList>
+                <TabsTrigger value="testCases">Test Cases</TabsTrigger>
+                <TabsTrigger value="testResults">Test Results</TabsTrigger>
+              </TabsList>
+              <TabsContent value="testCases">
+                <div>
+                  {testCases.map((testCase) => (
+                    <div key={testCase.id} className="mb-2 rounded border p-4">
+                      <div className="font-semibold">{testCase.description}</div>
+                      <div>
+                        <div className="font-medium">Inputs:</div> x = {testCase.inputs.x}, y ={' '}
+                        {testCase.inputs.y}, nums = [{testCase.inputs.nums.join(', ')}]
+                      </div>
+                      <div>
+                        <div className="font-medium">Expected Output:</div>{' '}
+                        {testCase.expectedOutput.join(', ')}
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium">Expected Output:</div>{' '}
-                      {testCase.expectedOutput.join(', ')}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div>
-                <div className="rounded border p-4">
-                  <div className="font-semibold">Test Output</div>
-                  {isCodeRunning ? (
-                    <div className="flex justify-center">
-                      <Loading />
-                    </div>
-                  ) : (
-                    <div>
-                      {formatOutput(error) ||
-                        formatOutput(output) ||
-                        'Output for the current test cases will be shown here...'}
-                    </div>
-                  )}
+                  ))}
                 </div>
-              </div>
-            )}
+              </TabsContent>
+              <TabsContent value="testResults">
+                <div>
+                  <div className="rounded border p-4">
+                    <div className="font-semibold">Test Output</div>
+                    {isCodeRunning ? (
+                      <div className="flex justify-center">
+                        <Loading />
+                      </div>
+                    ) : (
+                      <div>
+                        {formatOutput(error) ||
+                          formatOutput(output) ||
+                          'Output for the current test cases will be shown here...'}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       )}
