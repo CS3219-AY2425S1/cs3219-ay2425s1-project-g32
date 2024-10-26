@@ -6,12 +6,14 @@ import {
   useMemo,
   useState,
   useEffect,
+  useCallback,
 } from 'react';
 
 import { useRouter } from 'next/router';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 
+import { getUser } from '@/api/user';
 import { useToast } from '@/components/ui/toast/use-toast';
 import { useSession } from '@/context/useSession';
 
@@ -29,7 +31,7 @@ export interface LocalStorageJWT {
 }
 
 type RoomContextType = {
-  otherUser: string;
+  otherUser: User | null;
   provider: WebsocketProvider | null;
   ytext: Y.Text;
 };
@@ -73,9 +75,24 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
   const [provider, setProvider] = useState<WebsocketProvider | null>(null);
   const [ydoc] = useState(() => new Y.Doc());
   const [ytext] = useState(() => ydoc.getText('codemirror'));
-  const [otherUser, setOtherUser] = useState('');
+  const [otherUser, setOtherUser] = useState<User | null>(null);
   const { sessionData } = useSession();
   const { toast } = useToast();
+
+  const handle = useCallback(
+    async (id: string, accessToken: string) => {
+      try {
+        if (!id) {
+          return;
+        }
+        const user = await getUser(id, accessToken);
+        setOtherUser(user.data);
+      } catch (e) {
+        toast({ variant: 'destructive', description: 'Error fetching other user data' });
+      }
+    },
+    [toast]
+  );
 
   useEffect(() => {
     if (!sessionData || !roomId) return;
@@ -89,8 +106,9 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
       }
     );
     const handleChange = () => {
-      setOtherUser(
-        getOtherUser(wsProvider.awareness.getStates() as Map<number, State>, sessionData.user.id)
+      handle(
+        getOtherUser(wsProvider.awareness.getStates() as Map<number, State>, sessionData.user.id),
+        sessionData.accessToken
       );
     };
 
@@ -100,8 +118,9 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
       colorLight: userColor.light,
     });
 
-    setOtherUser(
-      getOtherUser(wsProvider.awareness.getStates() as Map<number, State>, sessionData.user.id)
+    handle(
+      getOtherUser(wsProvider.awareness.getStates() as Map<number, State>, sessionData.user.id),
+      sessionData.accessToken
     );
 
     wsProvider.awareness.on('change', handleChange);
@@ -115,7 +134,7 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
     } else {
       toast({ variant: 'destructive', description: 'Something went wrong' });
     }
-  }, [roomId, sessionData, toast, ydoc, ytext]);
+  }, [roomId, sessionData, toast, ydoc, ytext, handle]);
 
   const value = useMemo(() => ({ otherUser, provider, ytext }), [otherUser, provider, ytext]);
   return <RoomContext.Provider value={value}>{children}</RoomContext.Provider>;

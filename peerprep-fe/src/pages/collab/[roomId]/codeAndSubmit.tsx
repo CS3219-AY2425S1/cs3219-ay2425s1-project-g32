@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSession } from '@/context/useSession';
 
@@ -81,10 +82,11 @@ const CodeAndSubmit: FC<Props> = () => {
   };
 
   return (
-    <div className="flex flex-grow flex-col">
+    <div className="flex flex-grow flex-col bg-gray-50 p-4">
       <div className="flex flex-grow flex-col overflow-hidden rounded-lg bg-white p-4 shadow-md">
         <div className="mb-4 flex justify-between">
           <div className="flex items-center gap-x-2">
+            <SidebarTrigger className="text-gray-500" />
             <Select value={language} onValueChange={(v) => setLanguage(v)}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Select a language" />

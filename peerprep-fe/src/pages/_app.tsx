@@ -35,7 +35,7 @@ export default function App({ Component, ...pageProps }: AppAuthProps) {
   return (
     <SessionProvider>
       <div className="flex min-h-screen flex-col">
-        <Header />
+        {router.pathname.slice(1) !== 'collab/[roomId]' && <Header />}
         <main
           className={cn(
             inter.variable,

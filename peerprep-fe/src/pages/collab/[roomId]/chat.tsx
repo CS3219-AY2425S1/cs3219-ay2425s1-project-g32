@@ -10,7 +10,7 @@ import { useToast } from '@/components/ui/toast/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSession } from '@/context/useSession';
 
-import { useRoom } from './useRoomContext';
+import { useRoom } from './useRoom';
 
 enum VideoState {
   LOADING,
@@ -88,7 +88,7 @@ const Chat = () => {
     });
     // TODO: Timeout and cancel loading?
     setOtherVideoState(VideoState.LOADING);
-    const call = peer.call(otherUser, stream);
+    const call = peer.call(otherUser.id, stream);
     if (call) {
       call.on('stream', (userVideoStream) => {
         setOtherVideoState(VideoState.AVAILABLE);
@@ -170,7 +170,7 @@ const Chat = () => {
         <div className="h-[1px] w-full bg-gray-300" />
         <div className="flex flex-col gap-y-2">
           <div className="text-sm font-medium text-foreground">
-            username: <strong>{otherUser || 'Not in room'}</strong>
+            username: <strong>{otherUser?.username || 'Not in room'}</strong>
           </div>
           <Video stream={otherVideoStream} state={otherVideoState} />
         </div>
