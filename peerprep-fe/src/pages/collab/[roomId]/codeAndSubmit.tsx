@@ -6,7 +6,6 @@ import { runCode } from '@/api/code';
 import { LANGUAGES, EXECUTABLE_LANGUAGES } from '@/components/codeEditor/data/languages';
 import { THEMES } from '@/components/codeEditor/useThemesExtension';
 import { Button } from '@/components/ui/button';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hoverCard';
 import Loading from '@/components/ui/loading/loading';
 import {
   Select,
@@ -15,14 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import Skeleton from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSession } from '@/context/useSession';
 
 import CodeEditor from './codeEditor';
 
-interface Props {
-  roomId: string;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface Props {}
 
 const testCases = [
   {
@@ -49,7 +47,7 @@ const formatOutput = (text: string) => {
   ));
 };
 
-const CodeAndSubmit: FC<Props> = ({ roomId }) => {
+const CodeAndSubmit: FC<Props> = () => {
   const [activeTab, setActiveTab] = useState('testCases'); // State to handle tab switching
   const [isCodeRunning, setIsCodeRunning] = useState<boolean>(false);
   const [language, setLanguage] = useState<string>(LANGUAGES.PYTHON);
@@ -99,14 +97,14 @@ const CodeAndSubmit: FC<Props> = ({ roomId }) => {
                 ))}
               </SelectContent>
             </Select>
-            <HoverCard>
-              <HoverCardTrigger>
-                <InfoIcon className="h-4 w-4 text-gray-400" />
-              </HoverCardTrigger>
-              <HoverCardContent>
-                <div className="text-xs">Language does not support execution currently.</div>
-              </HoverCardContent>
-            </HoverCard>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon className="h-4 w-4 text-gray-400" />
+                </TooltipTrigger>
+                <TooltipContent>Language does not support execution currently.</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <Select value={theme} onValueChange={(v) => setTheme(v)}>
             <SelectTrigger className="w-40">
@@ -121,20 +119,10 @@ const CodeAndSubmit: FC<Props> = ({ roomId }) => {
             </SelectContent>
           </Select>
         </div>
-        {!roomId ? (
-          <div className="flex flex-grow flex-col gap-y-4">
-            <Skeleton className="h-4 w-1/2" />
-            {[...Array.from<number>({ length: 8 })]
-              .map((_, i) => i)
-              .map((v: number) => (
-                <Skeleton key={v} className="h-4" />
-              ))}
-          </div>
-        ) : (
-          <div className="flex-grow overflow-hidden rounded-lg">
-            <CodeEditor roomId={roomId} language={language} theme={theme} onCodeChange={setCode} />
-          </div>
-        )}
+
+        <div className="flex-grow overflow-hidden rounded-lg">
+          <CodeEditor language={language} theme={theme} onCodeChange={setCode} />
+        </div>
         {executable && (
           <div className="mt-4 flex justify-end">
             <Button onClick={handleRunCode}>Run Code</Button>

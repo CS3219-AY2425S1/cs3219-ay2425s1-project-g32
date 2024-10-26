@@ -57,7 +57,8 @@ export const SignInPage = ({
       const data = await signIn(form.getValues('email'), form.getValues('password'));
       toast({ description: 'Sign in!' });
       const jwt: LocalStorageJWT = {
-        accessToken: data.data.accessToken,
+        // accessToken: data.data.accessToken,
+        ...data.data,
       };
       initAuth(jwt);
       // 60s * 60 * 12 = 12hour - currently set to lower than jwt expiry

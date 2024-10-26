@@ -15,13 +15,14 @@ import { jwtDecode } from 'jwt-decode';
 import { Role, type User } from '@/types/user';
 
 export interface SessionData {
-  user: Pick<User, 'id' | 'role'>;
+  user: User;
   iat: number;
   exp: number;
   accessToken: string;
 }
 
-export interface LocalStorageJWT {
+// Store user fields in localstorage too for convenience
+export interface LocalStorageJWT extends User {
   accessToken: string;
 }
 
@@ -48,6 +49,10 @@ export const SessionProvider: FC<PropsWithChildren> = ({ children }) => {
       user: {
         id: x.id,
         role: Role.USER,
+        username: data.username,
+        email: data.email,
+        createdAt: data.createdAt,
+        isAdmin: data.isAdmin,
       },
       accessToken: data.accessToken,
     });
