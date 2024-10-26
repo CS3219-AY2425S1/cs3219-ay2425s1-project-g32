@@ -54,13 +54,13 @@ const CodeAndSubmit: FC<Props> = ({ roomId }) => {
   const [isCodeRunning, setIsCodeRunning] = useState<boolean>(false);
   const [language, setLanguage] = useState<string>(LANGUAGES.PYTHON);
   const [theme, setTheme] = useState<string>(THEMES.SOLARIZED_LIGHT);
+  const [code, setCode] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [output, setOutput] = useState<string>('');
   const executable = useMemo(
     () => Object.values(EXECUTABLE_LANGUAGES).includes(language),
     [language]
   );
-  const [code, setCode] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const [output, setOutput] = useState<string>('');
   const { sessionData } = useSession();
 
   const handleRunCode = async () => {
