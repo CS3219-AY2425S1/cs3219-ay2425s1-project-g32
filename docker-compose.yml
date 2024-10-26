@@ -44,3 +44,7 @@ services:
             - "1234:1234"
         depends_on:
             - peerprep-users
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /tmp/collab:/tmp/collab
+        privileged: true

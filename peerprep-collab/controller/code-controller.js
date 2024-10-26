@@ -26,6 +26,7 @@ export const runCode = async (req, res) => {
     let imageName;
     let command;
     let extension;
+    const randomString = randomBytes(8).toString('hex')
 
     switch (language) {
         case 'python':
@@ -62,8 +63,8 @@ export const runCode = async (req, res) => {
             return res.status(400).json({ error: 'Unsupported language.' });
     }
 
-    const fileName = `temp_${randomBytes(8).toString('hex')}.${extension}`;
-    const filePath = path.join('/tmp', fileName);
+    const fileName = `temp_${randomString}.${extension}`;
+    const filePath = path.join('/tmp/collab', fileName);
 
     try {
         let output = '';
@@ -123,6 +124,7 @@ export const runCode = async (req, res) => {
         // Send back the stdout, stderr, and exit code
         res.json({ output, error });
     } catch (err) {
+        console.log(err)
 
         // Cleanup in case of an error
         if (fs.existsSync(filePath)) {
