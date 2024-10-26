@@ -2,10 +2,12 @@ import { useMemo, useState, type FC } from 'react';
 
 import { InfoIcon } from 'lucide-react';
 
+import { runCode } from '@/api/code';
 import { LANGUAGES, EXECUTABLE_LANGUAGES } from '@/components/codeEditor/data/languages';
 import { THEMES } from '@/components/codeEditor/useThemesExtension';
 import { Button } from '@/components/ui/button';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hoverCard';
+import Loading from '@/components/ui/loading/loading';
 import {
   Select,
   SelectContent,
@@ -14,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import Skeleton from '@/components/ui/skeleton';
+import { useSession } from '@/context/useSession';
 
 import CodeEditor from './codeEditor';
 
@@ -36,18 +39,47 @@ const testCases = [
   },
 ];
 
+const formatOutput = (text: string) => {
+  if (!text) return '';
+  return text.split('\n').map((line) => (
+    <span>
+      {line}
+      <br />
+    </span>
+  ));
+};
+
 const CodeAndSubmit: FC<Props> = ({ roomId }) => {
   const [activeTab, setActiveTab] = useState('testCases'); // State to handle tab switching
+  const [isCodeRunning, setIsCodeRunning] = useState<boolean>(false);
   const [language, setLanguage] = useState<string>(LANGUAGES.PYTHON);
   const [theme, setTheme] = useState<string>(THEMES.SOLARIZED_LIGHT);
   const executable = useMemo(
     () => Object.values(EXECUTABLE_LANGUAGES).includes(language),
     [language]
   );
-  const [code, setCode] = useState<string>(''); // State to hold the code
+  const [code, setCode] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [output, setOutput] = useState<string>('');
+  const { sessionData } = useSession();
 
-  const handleRunCode = () => {
-    console.log('Running Code:', code, language);
+  const handleRunCode = async () => {
+    if (!sessionData) return;
+    try {
+      setIsCodeRunning(true);
+      setError('');
+      setActiveTab('testResult');
+      const res = await runCode(language.toLowerCase(), code, sessionData.accessToken);
+      setIsCodeRunning(false);
+      if (res.error !== '') {
+        setError(res.error);
+      } else {
+        setOutput(res.output);
+      }
+    } catch (error) {
+      setIsCodeRunning(false);
+      setError('An error occurred while running your code. Please try again.');
+    }
   };
 
   return (
@@ -152,7 +184,17 @@ const CodeAndSubmit: FC<Props> = ({ roomId }) => {
               <div>
                 <div className="rounded border p-4">
                   <div className="font-semibold">Test Output</div>
-                  <div>Output for the current test cases will be shown here...</div>
+                  {isCodeRunning ? (
+                    <div className="flex justify-center">
+                      <Loading />
+                    </div>
+                  ) : (
+                    <div>
+                      {formatOutput(error) ||
+                        formatOutput(output) ||
+                        'Output for the current test cases will be shown here...'}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

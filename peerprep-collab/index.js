@@ -4,13 +4,13 @@ import { WebSocketServer } from "ws";
 import { authenticateToken, auth } from "./middleware/auth.js";
 import { onConnection } from "./controller/collab-controller.js";
 import collabRoutes from "./routes/collab-routes.js";
+import codeRoutes from "./routes/code-routes.js";
 import "dotenv/config";
 
 const app = express();
 const port = 1234;
 
 app.use(json());
-app.use(auth);
 const server = createServer(app);
 const wss = new WebSocketServer({ noServer: true });
 
@@ -33,7 +33,9 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(auth);
 app.use("/collab", collabRoutes);
+app.use("/code", codeRoutes);
 
 // Handle WebSocket upgrades
 server.on("upgrade", async (request, socket, head) => {
