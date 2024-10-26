@@ -105,13 +105,14 @@ export const runCode = async (req, res) => {
         // Use demuxStream to separate stdout and stderr
         container.modem.demuxStream(stream, stdoutStream, stderrStream);
 
+        let timeout;
         const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => {
+            timeout = setTimeout(() => {
                 container.kill();
                 reject(new ContainerTimeoutError('Execution timed out'));
             }, 10000)
         );
-        await Promise.race([container.wait(), timeoutPromise]);
+        await Promise.race([container.wait().then(() => { clearTimeout(timeout) }), timeoutPromise]);
 
         // Remove the container
         await container.remove();

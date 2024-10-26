@@ -3,11 +3,11 @@ export const LANGUAGES: Record<string, string> = {
   C: 'C',
   PYTHON: 'Python',
   RUST: 'Rust',
-  HTML: 'HTML',
-  CSS: 'CSS',
-  MARKDOWN: 'Markdown',
+  // HTML: 'HTML',
+  // CSS: 'CSS',
+  // MARKDOWN: 'Markdown',
   JAVASCRIPT: 'Javascript',
-  TYPESCRIPT: 'Typescript',
+  // TYPESCRIPT: 'Typescript',
   GO: 'Go',
 };
 
