@@ -20,6 +20,13 @@ services:
         ports:
             - "3002:3002"
 
+    # for configuring a local rabbitmq instance
+    rabbitmq:
+        image: rabbitmq:3.13-management
+        ports:
+            - "15672:15672"
+            - "5672:5672"
+
     peerprep-match-api:
         build:
             context: ./peerprep-match
@@ -28,6 +35,7 @@ services:
             - "3003:3003"
         depends_on:
             - peerprep-users
+            - rabbitmq
 
     peerprep-match-worker:
         build:
@@ -35,6 +43,7 @@ services:
             dockerfile: ./Dockerfile.worker
         depends_on:
             - peerprep-users
+            - rabbitmq
 
     peerprep-collab:
         build:
