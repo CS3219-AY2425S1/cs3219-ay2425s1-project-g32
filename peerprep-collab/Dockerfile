@@ -15,6 +15,7 @@ COPY . .
 
 # Expose the port on which the app runs (default: 3000)
 EXPOSE 1234
+EXPOSE 9000
 
 # Start the application
-CMD ["npm", "start"]
+CMD ["npm", "run", "start-all"]
