@@ -44,8 +44,8 @@ const CodeAndSubmit = () => {
     <div className="flex-grow bg-muted/50 p-4">
       <ResizablePanelGroup direction="vertical">
         <ResizablePanel ref={testsPanelRef} defaultSize={100} minSize={50}>
-          <div className="flex h-full flex-col overflow-hidden rounded-lg border bg-background p-4 shadow-md">
-            <div className="mb-4 flex justify-between">
+          <div className="flex h-full flex-col">
+            <div className="mb-4 flex justify-between rounded-lg border bg-background p-4 shadow-sm">
               <div className="flex items-center gap-x-2">
                 <SidebarTrigger className="text-gray-500" />
                 <Select value={language} onValueChange={(v) => setLanguage(v)}>
@@ -82,7 +82,7 @@ const CodeAndSubmit = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex-grow overflow-hidden rounded-lg">
+            <div className="flex-grow overflow-hidden rounded-lg border">
               <CodeMirrorEditor language={language} theme={theme} onCodeChange={setCode} />
             </div>
           </div>
