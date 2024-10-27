@@ -7,7 +7,6 @@ import (
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/api/controller"
 	authMiddleware "github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/api/middleware"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/db"
-	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/messagequeue"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/repository"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -18,7 +17,7 @@ func main() {
 	// connect to db
 	mongoClient := db.ConnectDB()
 	// connect to messagequeue
-	mqConn, err := messagequeue.ConnectRabbitMQ()
+	mqConn, err := messagequeue.ConnectRabbitMQ("MATCHING_RMQ_URI", "MATCHING_QUEUE")
 	if err != nil {
 		log.Fatalf("Failed to connect to rabbitmq: %v", err)
 		return

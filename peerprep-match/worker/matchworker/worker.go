@@ -15,7 +15,7 @@ type Worker struct {
 }
 
 func NewWorker(matchRepository repository.MatchRepository) (*Worker, error) {
-	conn, err := messagequeue.ConnectRabbitMQ()
+	conn, err := messagequeue.ConnectRabbitMQ("MATCHING_RMQ_URI", "MATCHING_QUEUE")
 	if err != nil {
 		log.Fatal("Error connecting to rabbit mq")
 		return nil, err

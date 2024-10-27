@@ -1,4 +1,4 @@
-package messagequeue
+package rabbitmq
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/model"
 	"github.com/joho/godotenv"
 	"github.com/streadway/amqp"
 )
@@ -18,17 +17,17 @@ type RabbitMQConn struct {
 	Channel   *amqp.Channel
 }
 
-func ConnectRabbitMQ() (*RabbitMQConn, error) {
+func ConnectRabbitMQ(uri_env_var string, queue_name_env_var string) (*RabbitMQConn, error) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 		return nil, err
 	}
-	uri := os.Getenv("RABBIT_MQ_URI")
+	uri := os.Getenv(uri_env_var)
 	conn, err := amqp.Dial(uri)
-	queue_name := os.Getenv("RABBIT_MQ_NAME")
+	queue_name := os.Getenv(uri_env_var)
 	if err != nil {
-		log.Fatal("Error creating conn to rabbitmq, %s", err)
+		log.Fatalf("Error creating conn to rabbitmq, %s", err)
 		return nil, err
 	}
 
@@ -48,10 +47,10 @@ func ConnectRabbitMQ() (*RabbitMQConn, error) {
 	return &mqConn, nil
 }
 
-func (r *RabbitMQConn) Publish(msg model.MatchRequestMessage) error {
+func (r *RabbitMQConn) Publish(msg interface{}) error {
 	body, err := json.Marshal(msg)
 	if err != nil {
-		log.Fatal("Error marshalling message, %s", err)
+		log.Fatalf("Error marshalling message, %s", err)
 		return err
 	}
 	log.Println("Publishing MQ message")
