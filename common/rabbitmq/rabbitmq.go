@@ -25,7 +25,7 @@ func ConnectRabbitMQ(uri_env_var string, queue_name_env_var string) (*RabbitMQCo
 	}
 	uri := os.Getenv(uri_env_var)
 	conn, err := amqp.Dial(uri)
-	queue_name := os.Getenv(uri_env_var)
+	queue_name := os.Getenv(queue_name_env_var)
 	if err != nil {
 		log.Fatalf("Error creating conn to rabbitmq, %s", err)
 		return nil, err
