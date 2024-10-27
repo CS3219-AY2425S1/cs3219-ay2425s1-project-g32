@@ -1,13 +1,14 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { getQuestions } from '@/api/question';
-import CreateQuestionModal from '@/components/questions/CreateQuestionModal';
-import QuestionTableRow from '@/components/questions/QuestionTableRow';
 import Skeleton from '@/components/ui/skeleton';
 import { TableHeader, TableRow, TableHead, TableBody, Table } from '@/components/ui/table';
 import { useToast } from '@/components/ui/toast/use-toast';
 import { type Question } from '@/types/question';
 import { Role } from '@/types/user';
+
+import CreateQuestionModal from './components/CreateQuestionModal';
+import QuestionTableRow from './components/QuestionTableRow';
 
 const QuestionsPage = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -45,11 +46,9 @@ const QuestionsPage = () => {
         setQuestions((prevQuestions) => prevQuestions.filter((q) => q.id !== id));
         toast({ description: 'Question deleted successfully' });
       } else {
-        console.error('Failed to delete question');
         toast({ variant: 'destructive', description: 'Error deleting question' });
       }
     } catch (error) {
-      console.error('Error deleting question:', error);
       toast({ variant: 'destructive', description: 'Error deleting question' });
     }
   };
@@ -74,11 +73,9 @@ const QuestionsPage = () => {
         );
         toast({ description: 'Question updated successfully' });
       } else {
-        console.error('Failed to update question');
         toast({ variant: 'destructive', description: 'Error updating question' });
       }
     } catch (error) {
-      console.error('Error updating question:', error);
       toast({ variant: 'destructive', description: 'Error updating question' });
     }
   };
@@ -101,11 +98,9 @@ const QuestionsPage = () => {
         setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
         toast({ description: 'Question created successfully' });
       } else {
-        console.error('Failed to create question');
         toast({ variant: 'destructive', description: 'Error creating question' });
       }
     } catch (error) {
-      console.error('Error creating question:', error);
       toast({ variant: 'destructive', description: 'Error creating question' });
     }
   };

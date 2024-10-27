@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Tag } from 'lucide-react';
 
 import { getQuestion } from '@/api/question';
-import Difficulty from '@/components/questions/Difficulty';
+import Difficulty from '@/pages/questions/components/Difficulty';
 import {
   Accordion,
   AccordionContent,

@@ -5,7 +5,8 @@ import * as Yup from 'yup';
 
 import { Button } from '@/components/ui/button';
 import Label from '@/components/ui/label';
-import { Question } from '@/types/question';
+
+import type { Question } from '@/types/question';
 
 interface EditQuestionFormProps {
   question: Question;
