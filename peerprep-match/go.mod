@@ -3,7 +3,7 @@ module github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match
 go 1.23.1
 
 require (
-	github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/common v0.0.0-20241027053231-cca0534c6eef
+	github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/common v0.0.0-20241027065143-632267d2fb2d
 	github.com/go-chi/chi v1.5.5
 	github.com/joho/godotenv v1.5.1
 	github.com/rs/cors v1.11.1

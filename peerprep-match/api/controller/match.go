@@ -67,12 +67,13 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 
 	// update db
 	match := model.Match{
-		UserId:      user.Id,
-		Category:    matchRequest.Category,
-		Complexity:  matchRequest.Complexity,
-		HasMatch:    false,
-		CreatedAt:   primitive.NewDateTimeFromTime(time.Now()),
-		IsCancelled: false,
+		UserId:        user.Id,
+		Category:      matchRequest.Category,
+		Complexity:    matchRequest.Complexity,
+		HasMatch:      false,
+		CreatedAt:     primitive.NewDateTimeFromTime(time.Now()),
+		IsCancelled:   false,
+		IsRoomCreated: false,
 	}
 	res, _ := mc.matchRepository.CreateMatch(match)
 	reqId := res.InsertedID.(primitive.ObjectID)
@@ -115,7 +116,11 @@ func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
 
 	var status string
 	if req.HasMatch {
-		status = "Matched"
+		if req.IsRoomCreated {
+			status = "Matched"
+		} else {
+			status = "CreatingRoom"
+		}
 	} else {
 		if time.Since(req.CreatedAt.Time()) > 5*time.Minute {
 			status = "Timeout"
@@ -142,6 +147,22 @@ func (mc *MatchController) Cancel(w http.ResponseWriter, r *http.Request) {
 	err = mc.matchRepository.CancelMatch(cancelRequest)
 	if err != nil {
 		http.Error(w, "Failed to set as cancelled", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+}
+
+func (mc *MatchController) RoomCreated(w http.ResponseWriter, r *http.Request) {
+	var roomCreatedReq model.RoomCreatedReq
+	err := json.NewDecoder(r.Body).Decode(&roomCreatedReq)
+	if err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
+		return
+	}
+	err = mc.matchRepository.UpdateRoomCreated(roomCreatedReq)
+	if err != nil {
+		http.Error(w, "Failed to update room created", http.StatusInternalServerError)
 		return
 	}
 

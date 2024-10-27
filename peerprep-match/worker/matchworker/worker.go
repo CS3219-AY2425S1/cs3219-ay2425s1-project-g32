@@ -11,7 +11,8 @@ import (
 
 type Worker struct {
 	matchRepository repository.MatchRepository
-	rabbitMQConn    *rabbitmq.RabbitMQConn
+	matchingRMQConn *rabbitmq.RabbitMQConn
+	collabRMQConn   *rabbitmq.RabbitMQConn
 }
 
 func NewWorker(matchRepository repository.MatchRepository) (*Worker, error) {
@@ -20,23 +21,29 @@ func NewWorker(matchRepository repository.MatchRepository) (*Worker, error) {
 		log.Fatal("Error connecting to rabbit mq")
 		return nil, err
 	}
+	collabMqConn, err := rabbitmq.ConnectRabbitMQ("COLLAB_RMQ_URI", "COLLAB_QUEUE")
+	if err != nil {
+		log.Fatalf("Failed to connect to rabbitmq: %v", err)
+		return nil, err
+	}
 
 	return &Worker{
 		matchRepository: matchRepository,
-		rabbitMQConn:    conn,
+		matchingRMQConn: conn,
+		collabRMQConn:   collabMqConn,
 	}, nil
 }
 
 func (w *Worker) Run() {
 	// Handle messages asynchronously
-	msgs, err := w.rabbitMQConn.Consume()
+	msgs, err := w.matchingRMQConn.Consume()
 	if err != nil {
 		log.Fatalf("Failed to consume messages: %v", err)
 	}
 	go func() {
 		for msg := range msgs {
 			log.Printf("Consumed msg: %s, logging queue status", msg.Body)
-			w.rabbitMQConn.LogQueueStatus()
+			w.matchingRMQConn.LogQueueStatus()
 			var matchRequestMessage model.MatchRequestMessage
 			err := matchRequestMessage.UnmarshalJSON(msg.Body)
 			if err != nil {
@@ -46,7 +53,7 @@ func (w *Worker) Run() {
 
 			w.HandleMessage(matchRequestMessage)
 			log.Printf("Done with processing msg, logging queue status")
-			w.rabbitMQConn.LogQueueStatus()
+			w.matchingRMQConn.LogQueueStatus()
 			time.Sleep(time.Second)
 			msg.Ack(false)
 		}
@@ -82,7 +89,7 @@ func (w *Worker) GetMatch(request model.Match) (*model.Match, error) {
 	}
 
 	if len(data) > 0 {
-		log.Printf("Found %d match requests with the complexity, matching with the oldest one.", len(data))
+		log.Printf("Found %d match requests with the same complexity, matching with the oldest one.", len(data))
 		return &data[0], nil
 	}
 	// 3. check requests with same category
@@ -128,7 +135,31 @@ func (w *Worker) HandleMessage(req model.MatchRequestMessage) error {
 	}
 
 	log.Printf("Found match for Id: %s , matched Id: %s", req.Id, otherMatch.Id)
-	// TODO: Create collaboration service message
+
+	var complexity string
+	var category string
+
+	if match.Complexity == otherMatch.Complexity {
+		complexity = match.Complexity
+	} else {
+		complexity = ""
+	}
+	if match.Category == otherMatch.Category {
+		category = match.Category
+	} else {
+		category = ""
+	}
+
+	collab_message := model.CollabMessage{
+		UserId1:    match.UserId,
+		UserId2:    otherMatch.UserId,
+		MatchId1:   match.Id.Hex(),
+		MatchId2:   otherMatch.Id.Hex(),
+		Complexity: complexity,
+		Category:   category,
+	}
+	w.collabRMQConn.Publish(collab_message)
+	log.Printf("Publishing to the collab mq - %s", collab_message)
 
 	// Update the 2 user's match status
 	w.matchRepository.UpdateMatch(otherMatch.Id, model.UpdateMatchRequest{
@@ -147,10 +178,14 @@ func (w *Worker) HandleMessage(req model.MatchRequestMessage) error {
 	return nil
 }
 
-func (w *Worker) DeclareQueue() error {
-	return w.rabbitMQConn.DeclareQueue()
+func (w *Worker) DeclareQueues() error {
+	err := w.matchingRMQConn.DeclareQueue()
+	if err != nil {
+		return err
+	}
+	return w.collabRMQConn.DeclareQueue()
 }
 
 func (w *Worker) Close() {
-	w.rabbitMQConn.Close()
+	w.matchingRMQConn.Close()
 }

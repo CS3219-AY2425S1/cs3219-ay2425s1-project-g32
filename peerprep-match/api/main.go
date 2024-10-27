@@ -17,7 +17,7 @@ import (
 func main() {
 	// connect to db
 	mongoClient := db.ConnectDB()
-	// connect to messagequeue
+	// connect to messagequeues
 	matchingMqConn, err := rabbitmq.ConnectRabbitMQ("MATCHING_RMQ_URI", "MATCHING_QUEUE")
 	if err != nil {
 		log.Fatalf("Failed to connect to rabbitmq: %v", err)
@@ -42,6 +42,7 @@ func main() {
 		r.Post("/", controller.Match)
 		r.Get("/poll/{id}", controller.Poll)
 		r.Post("/cancel", controller.Cancel)
+		r.Post("/room-created", controller.RoomCreated)
 	})
 	log.Println("Running on port 3003")
 	http.ListenAndServe(":3003", r)

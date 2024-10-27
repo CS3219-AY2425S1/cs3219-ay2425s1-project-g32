@@ -183,3 +183,21 @@ func (qr MatchRepository) CreateMatch(match model.Match) (*mongo.InsertOneResult
 	}
 	return result, nil
 }
+
+func (mr MatchRepository) UpdateRoomCreated(req model.RoomCreatedReq) error {
+	id1, _ := primitive.ObjectIDFromHex(req.MatchId1)
+	id2, _ := primitive.ObjectIDFromHex(req.MatchId2)
+	filter := bson.M{"_id": bson.M{"$in": []primitive.ObjectID{id1, id2}}}
+	collection := db.GetCollection(mr.mongoClient, "matches")
+	update := bson.M{
+		"$set": bson.M{
+			"is_room_created": true,
+		},
+	}
+	res, err := collection.UpdateMany(context.Background(), filter, update)
+	if err != nil {
+		return err
+	}
+	log.Printf("%d records modified for room creation", res.ModifiedCount)
+	return nil
+}

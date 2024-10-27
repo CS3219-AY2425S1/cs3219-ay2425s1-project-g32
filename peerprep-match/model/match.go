@@ -45,13 +45,14 @@ func (m *MatchRequestMessage) UnmarshalJSON(data []byte) error {
 }
 
 type Match struct {
-	Id          primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"` // mongo uses _id in bson for their object id, json id is for our requests
-	UserId      string             `json:"user_id" bson:"user_id"`
-	Category    string             `json:"category"`
-	Complexity  string             `json:"complexity"`
-	HasMatch    bool               `json:"has_match" bson:"has_match"`
-	CreatedAt   primitive.DateTime `json:"created_at" bson:"created_at"`
-	IsCancelled bool               `json:"is_cancelled" bson:"is_cancelled"`
+	Id            primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"` // mongo uses _id in bson for their object id, json id is for our requests
+	UserId        string             `json:"user_id" bson:"user_id"`
+	Category      string             `json:"category"`
+	Complexity    string             `json:"complexity"`
+	HasMatch      bool               `json:"has_match" bson:"has_match"`
+	CreatedAt     primitive.DateTime `json:"created_at" bson:"created_at"`
+	IsCancelled   bool               `json:"is_cancelled" bson:"is_cancelled"`
+	IsRoomCreated bool               `json:"is_room_created" bson:"is_room_created"`
 }
 
 type UpdateMatchRequest struct {
@@ -69,4 +70,18 @@ type GetMatchFilter struct {
 	UserId     string `json:"user_id" bson:"user_id"`
 	Category   string `json:"category"`
 	Complexity string `json:"complexity"`
+}
+
+type CollabMessage struct {
+	UserId1    string `json:"user_id1"`
+	UserId2    string `json:"user_id2"`
+	MatchId1   string `json:"match_id1"`
+	MatchId2   string `json:"match_id2"`
+	Category   string `json:"category"`
+	Complexity string `json:"complexity"`
+}
+
+type RoomCreatedReq struct {
+	MatchId1 string `json:"match_id1"`
+	MatchId2 string `json:"match_id2"`
 }

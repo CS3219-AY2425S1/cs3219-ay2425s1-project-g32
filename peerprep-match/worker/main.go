@@ -20,8 +20,8 @@ func main() {
 	}
 	defer worker.Close()
 
-	if err = worker.DeclareQueue(); err != nil {
-		log.Fatalf("Failed to register consumer: %v", err)
+	if err = worker.DeclareQueues(); err != nil {
+		log.Fatalf("Failed to declare queues: %v", err)
 		return
 	}
 
