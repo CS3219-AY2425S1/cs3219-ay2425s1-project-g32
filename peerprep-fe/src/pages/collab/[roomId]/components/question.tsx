@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { Tag } from 'lucide-react';
 
 import { getQuestion } from '@/api/question';
-import Difficulty from '@/pages/questions/components/Difficulty';
 import {
   Accordion,
   AccordionContent,
@@ -13,6 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Separator from '@/components/ui/separator';
 import { useToast } from '@/components/ui/toast/use-toast';
+import Difficulty from '@/pages/questions/components/Difficulty';
 
 import type { Question as QuestionType } from '@/types/question';
 

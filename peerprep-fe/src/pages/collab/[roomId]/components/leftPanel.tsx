@@ -21,14 +21,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdownMenu';
+import Label from '@/components/ui/label';
 import Separator from '@/components/ui/separator';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import Chat from './chat';
 import Question from './question';
 
 const LeftPanel = () => {
+  const [tab, setTab] = useState('chat');
   const [showConfirm, setShowConfirm] = useState(false);
   const { setTheme } = useTheme();
   const onEndSession = () => {
@@ -37,26 +39,26 @@ const LeftPanel = () => {
   return (
     <>
       <Sidebar>
-        <SidebarHeader className="p-5">
+        <SidebarHeader className="flex flex-row items-center gap-x-2 p-5">
           <Link href="/">
             <div className="text-lg font-bold">Peerprep</div>
           </Link>
-          <div>Session with Paul</div>
+          <Label className="mt-1">[Session with Paul]</Label>
         </SidebarHeader>
         <Separator />
         <SidebarContent>
           <div className="h-full overflow-scroll rounded-md bg-background p-4 shadow-md">
-            <Tabs defaultValue="question">
+            <Tabs defaultValue={tab} onValueChange={(val) => setTab(val)}>
               <TabsList>
                 <TabsTrigger value="question">Question</TabsTrigger>
                 <TabsTrigger value="chat">Chat</TabsTrigger>
               </TabsList>
-              <TabsContent value="question">
+              <div style={{ display: tab === 'question' ? 'block' : 'none' }}>
                 <Question />
-              </TabsContent>
-              <TabsContent value="chat">
+              </div>
+              <div style={{ display: tab === 'chat' ? 'block' : 'none' }}>
                 <Chat />
-              </TabsContent>
+              </div>
             </Tabs>
           </div>
         </SidebarContent>

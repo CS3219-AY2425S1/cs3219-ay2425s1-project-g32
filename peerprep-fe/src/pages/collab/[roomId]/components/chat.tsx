@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Phone, VideoOff } from 'lucide-react';
-import Peer from 'peerjs';
+import { Phone, PhoneOff, VideoOff } from 'lucide-react';
+import Peer, { type MediaConnection } from 'peerjs';
 
 import { Button } from '@/components/ui/button';
 import Loading from '@/components/ui/loading/loading';
@@ -49,11 +49,11 @@ const Video = ({ state, stream }: { state: VideoState; stream: MediaStream | und
     }
   }, [state]);
 
+  const height = useMemo(() => (state !== VideoState.AVAILABLE ? 'h-72 border' : ''), [state]);
+
   return (
     <div
-      className={`${
-        state !== VideoState.AVAILABLE ? 'h-72' : ''
-      } flex w-full items-center justify-center rounded-lg border shadow-lg`}
+      className={`${height} flex w-full items-center justify-center overflow-hidden rounded-lg shadow-lg`}
     >
       {component}
     </div>
@@ -67,6 +67,7 @@ const Chat = () => {
   const [myVideoState, setMyVideoState] = useState(VideoState.UNAVAILABLE);
   const [otherVideoState, setOtherVideoState] = useState(VideoState.UNAVAILABLE);
   const [peer, setPeer] = useState<Peer | null>(null);
+  const [call, setCall] = useState<MediaConnection>();
   const { sessionData } = useSession();
   const { otherUser } = useRoom();
   const { toast } = useToast();
@@ -80,13 +81,7 @@ const Chat = () => {
       video: true,
       audio: true,
     });
-    peer.on('call', (call) => {
-      call.answer(stream);
-      call.on('stream', (userVideoStream) => {
-        setOtherVideoState(VideoState.AVAILABLE);
-        setOtherVideoStream(userVideoStream);
-      });
-    });
+
     // TODO: Timeout and cancel loading?
     setOtherVideoState(VideoState.LOADING);
     const call = peer.call(otherUser.id, stream);
@@ -95,9 +90,15 @@ const Chat = () => {
         setOtherVideoState(VideoState.AVAILABLE);
         setOtherVideoStream(userVideoStream);
       });
+
+      call.on('close', () => {
+        setOtherVideoState(VideoState.UNAVAILABLE);
+      });
     } else {
-      toast({ variant: 'destructive', description: 'User not ready yet' });
+      toast({ variant: 'destructive', description: 'Somethign went wrong with the server' });
+      setOtherVideoState(VideoState.UNAVAILABLE);
     }
+    setCall(call);
   };
 
   const onReady = async () => {
@@ -110,12 +111,32 @@ const Chat = () => {
       });
       setMyVideoState(VideoState.AVAILABLE);
       setMyVideoStream(stream);
+      peer.on('call', (call) => {
+        call.answer(stream);
+        call.on('stream', (userVideoStream) => {
+          setOtherVideoState(VideoState.AVAILABLE);
+          setOtherVideoStream(userVideoStream);
+        });
+        call.on('close', () => {
+          setOtherVideoState(VideoState.UNAVAILABLE);
+        });
+      });
     } catch (e) {
       toast({ variant: 'destructive', description: 'unable to turn on your camera/mic' });
       return;
     }
-
     setReady(true);
+  };
+
+  const onEndCall = () => {
+    if (!call || !peer) return;
+    call.off('stream');
+    peer.off('call');
+    peer.emit('close');
+    call.emit('close');
+    call.close();
+    setCall(undefined);
+    setOtherVideoState(VideoState.UNAVAILABLE);
   };
 
   // Connect to chat
@@ -148,18 +169,29 @@ const Chat = () => {
         <Button size="sm" className="text-xs" onClick={onReady}>
           Enable Camera/Mic
         </Button>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <Button disabled={!ready} size="sm" variant="outline" onClick={onInitiateCall}>
-                  <Phone className="h-4 w-4" />
-                </Button>
-              </div>
-            </TooltipTrigger>
-            {!ready && <TooltipContent>You need to enable camera and mic first</TooltipContent>}
-          </Tooltip>
-        </TooltipProvider>
+        <div className="flex gap-x-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Button disabled={!ready} size="sm" variant="outline" onClick={onInitiateCall}>
+                    <Phone className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              {!ready && <TooltipContent>You need to enable camera and mic first</TooltipContent>}
+            </Tooltip>
+          </TooltipProvider>
+          <Button
+            disabled={!call}
+            size="sm"
+            variant="outline"
+            onClick={onEndCall}
+            className="bg-red-500 text-white"
+          >
+            <PhoneOff className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       <div className="flex flex-col gap-y-5">
         <div className="flex flex-col gap-y-2">

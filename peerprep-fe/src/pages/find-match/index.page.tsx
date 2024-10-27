@@ -116,7 +116,7 @@ const FindMatchPage = () => {
           case PollStatus.MATCHED: {
             setMatchRequestId('');
             toast({ description: 'Found a match, redirecting you to collaborative page' });
-            router.push('/question');
+            router.push('/code/123');
             break;
           }
           case PollStatus.MATCHING: {
