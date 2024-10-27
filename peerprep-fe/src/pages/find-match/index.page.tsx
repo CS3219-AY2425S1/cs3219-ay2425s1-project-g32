@@ -51,6 +51,7 @@ const FindMatchPage = () => {
   const [topic, setTopic] = useState(+new Date());
   const [matchRequestId, setMatchRequestId] = useState('');
   const [error, setError] = useState('');
+  const [creatingRoom, setCreatingRoom] = useState(false);
   const { sessionData } = useSession();
   const pollIntervalId = useRef<ReturnType<typeof setInterval> | null>(null);
   const [time, setTime] = useState(0);
@@ -71,6 +72,7 @@ const FindMatchPage = () => {
       return;
     }
 
+    setCreatingRoom(false);
     setTime(0);
     setMatchRequestId('');
     setDisplayHint(false);
@@ -129,6 +131,10 @@ const FindMatchPage = () => {
             setMatchRequestId('');
             break;
           }
+          case PollStatus.CREATING_ROOM: {
+            setCreatingRoom(true);
+            break;
+          }
           default: {
             throw Error();
           }
@@ -167,16 +173,26 @@ const FindMatchPage = () => {
           hideClose
         >
           <DialogHeader>
-            <DialogTitle>Finding a match now...</DialogTitle>
+            <DialogTitle>{!creatingRoom ? 'Finding a match now...' : 'FOUND a match'}</DialogTitle>
             <DialogDescription>
-              Closing this popup ends the search and you will need to find match again.
-              <br />
-              {displayHint && (
+              {!creatingRoom ? (
                 <>
-                  You have previously searched for a match and we are still looking for that match.
+                  Closing this popup ends the search and you will need to find match again.
                   <br />
-                  Please cancel if you would like to reset make a new search
+                  {displayHint && (
+                    <>
+                      You have previously searched for a match and we are still looking for that
+                      match.
+                      <br />
+                      Please cancel if you would like to reset make a new search
+                    </>
+                  )}
                 </>
+              ) : (
+                <div>
+                  Found a match, creating the room now. <br /> Will redirect you when room is
+                  created
+                </div>
               )}
               <BlockSpinning height="100" width="100" />
               <strong>Time elapsed</strong>:&nbsp;{Math.floor(time / 1000)}s
