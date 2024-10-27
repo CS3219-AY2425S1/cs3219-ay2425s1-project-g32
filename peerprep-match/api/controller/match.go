@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/common/rabbitmq"
 	authMiddleware "github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/api/middleware"
-	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/messagequeue"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/model"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/repository"
 	"github.com/go-chi/chi"
@@ -17,10 +17,10 @@ import (
 
 type MatchController struct {
 	matchRepository repository.MatchRepository
-	mqConn          *messagequeue.RabbitMQConn
+	mqConn          *rabbitmq.RabbitMQConn
 }
 
-func NewMatchController(matchRepository repository.MatchRepository, mqConn *messagequeue.RabbitMQConn) *MatchController {
+func NewMatchController(matchRepository repository.MatchRepository, mqConn *rabbitmq.RabbitMQConn) *MatchController {
 	return &MatchController{
 		matchRepository: matchRepository,
 		mqConn:          mqConn,

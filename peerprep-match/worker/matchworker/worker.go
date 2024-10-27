@@ -4,18 +4,18 @@ import (
 	"log"
 	"time"
 
-	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/messagequeue"
+	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/common/rabbitmq"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/model"
 	"github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match/repository"
 )
 
 type Worker struct {
 	matchRepository repository.MatchRepository
-	rabbitMQConn    *messagequeue.RabbitMQConn
+	rabbitMQConn    *rabbitmq.RabbitMQConn
 }
 
 func NewWorker(matchRepository repository.MatchRepository) (*Worker, error) {
-	conn, err := messagequeue.ConnectRabbitMQ("MATCHING_RMQ_URI", "MATCHING_QUEUE")
+	conn, err := rabbitmq.ConnectRabbitMQ("MATCHING_RMQ_URI", "MATCHING_QUEUE")
 	if err != nil {
 		log.Fatal("Error connecting to rabbit mq")
 		return nil, err
