@@ -143,7 +143,7 @@ const QuestionsPage = () => {
 };
 
 QuestionsPage.authenticationEnabled = {
-  role: Role.USER,
+  role: Role.ADMIN,
 };
 
 export default QuestionsPage;

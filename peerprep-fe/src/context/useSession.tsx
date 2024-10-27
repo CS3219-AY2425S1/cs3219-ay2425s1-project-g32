@@ -75,6 +75,7 @@ export const SessionProvider: FC<PropsWithChildren> = ({ children }) => {
 
     const localData = JSON.parse(value) as LocalStorageJWT;
     updateAuth(localData);
+    setLoading(false);
   }, []);
 
   const value = useMemo(

@@ -73,12 +73,6 @@ const AuthGuard: FC<PropsWithChildren<Props>> = ({ children, config }) => {
 
   return (
     <div className="mt-44 flex flex-col items-center">
-      {/* <Image
-        src={`${env.NEXT_PUBLIC_S3_BUCKET_URL}/public/icons/progress.svg`}
-        alt="Loading..."
-        width={100}
-        height={100}
-      /> */}
       <div className="font-bold">Authenticating your account...</div>
     </div>
   );

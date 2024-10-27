@@ -1,6 +1,7 @@
 import { Fragment, useState, useCallback, useEffect, useRef } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -200,118 +201,123 @@ const FindMatchPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <div className="layout">
-        <div className="flex flex-col items-start gap-2 py-8">
-          <h1 className="text-3xl font-bold">Find a Match</h1>
-          <p className="text-lg font-light text-foreground">
-            Select your preferred difficulty and topic you would like to practice.
-          </p>
+      <div className="layout mt-8 flex items-center gap-x-8">
+        <div>
+          <div className="flex flex-col items-start gap-2 py-8">
+            <h1 className="text-3xl font-bold">Find a Match</h1>
+            <p className="text-lg font-light text-foreground">
+              Select your preferred difficulty and topic you would like to practice.
+            </p>
+          </div>
+          <div className="relative w-[400px]">
+            {error && <div className="mb-4 rounded-md bg-red-100 p-4 text-red-700">{error}</div>}
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <div className={`flex flex-col gap-y-5 ${matchRequestId ? 'opacity-50' : ''}`}>
+                  <FormField
+                    control={form.control}
+                    name="difficulty"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="itms-center flex justify-between">
+                          <span>Difficulty</span>
+                          <Badge
+                            onClick={() => {
+                              form.resetField('difficulty');
+                              setDifficulty(+new Date());
+                            }}
+                            variant="outline"
+                            className="cursor-pointer hover:bg-accent"
+                          >
+                            Clear
+                          </Badge>
+                        </FormLabel>
+                        <Select
+                          disabled={!!matchRequestId}
+                          key={difficulty}
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a verified email to display" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {DIFFICULTIES?.length ? (
+                              DIFFICULTIES?.map((d) => (
+                                <Fragment key={d}>
+                                  <SelectItem className="cursor-pointer" value={d}>
+                                    {d}
+                                  </SelectItem>
+                                </Fragment>
+                              ))
+                            ) : (
+                              <div>Error loading schools</div>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="topic"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="itms-center flex justify-between">
+                          <span>Topic</span>
+                          <Badge
+                            onClick={() => {
+                              form.resetField('topic');
+                              setTopic(+new Date());
+                            }}
+                            variant="outline"
+                            className="cursor-pointer hover:bg-accent"
+                          >
+                            Clear
+                          </Badge>
+                        </FormLabel>
+                        <Select
+                          disabled={!!matchRequestId}
+                          key={topic}
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a verified email to display" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {TOPICS?.length ? (
+                              TOPICS?.map((d) => (
+                                <Fragment key={d}>
+                                  <SelectItem className="cursor-pointer" value={d}>
+                                    {d}
+                                  </SelectItem>
+                                </Fragment>
+                              ))
+                            ) : (
+                              <div>Error loading schools</div>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button disabled={!!matchRequestId} className="w-full" type="submit">
+                    Find Match
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
         </div>
-        <div className="relative w-[400px]">
-          {error && <div className="mb-4 rounded-md bg-red-100 p-4 text-red-700">{error}</div>}
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className={`flex flex-col gap-y-5 ${matchRequestId ? 'opacity-50' : ''}`}>
-                <FormField
-                  control={form.control}
-                  name="difficulty"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="itms-center flex justify-between">
-                        <span>Difficulty</span>
-                        <Badge
-                          onClick={() => {
-                            form.resetField('difficulty');
-                            setDifficulty(+new Date());
-                          }}
-                          variant="outline"
-                          className="cursor-pointer hover:bg-accent"
-                        >
-                          Clear
-                        </Badge>
-                      </FormLabel>
-                      <Select
-                        disabled={!!matchRequestId}
-                        key={difficulty}
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a verified email to display" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {DIFFICULTIES?.length ? (
-                            DIFFICULTIES?.map((d) => (
-                              <Fragment key={d}>
-                                <SelectItem className="cursor-pointer" value={d}>
-                                  {d}
-                                </SelectItem>
-                              </Fragment>
-                            ))
-                          ) : (
-                            <div>Error loading schools</div>
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="topic"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="itms-center flex justify-between">
-                        <span>Topic</span>
-                        <Badge
-                          onClick={() => {
-                            form.resetField('topic');
-                            setTopic(+new Date());
-                          }}
-                          variant="outline"
-                          className="cursor-pointer hover:bg-accent"
-                        >
-                          Clear
-                        </Badge>
-                      </FormLabel>
-                      <Select
-                        disabled={!!matchRequestId}
-                        key={topic}
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a verified email to display" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {TOPICS?.length ? (
-                            TOPICS?.map((d) => (
-                              <Fragment key={d}>
-                                <SelectItem className="cursor-pointer" value={d}>
-                                  {d}
-                                </SelectItem>
-                              </Fragment>
-                            ))
-                          ) : (
-                            <div>Error loading schools</div>
-                          )}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button disabled={!!matchRequestId} className="w-full" type="submit">
-                  Find Match
-                </Button>
-              </div>
-            </form>
-          </Form>
+        <div>
+          <Image src="/find-match.svg" alt="Find match" width={500} height={500} />
         </div>
       </div>
     </>
