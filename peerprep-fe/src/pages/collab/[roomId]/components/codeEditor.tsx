@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import CodeEditor from '@/components/codeEditor';
 
-import { useRoom } from './useRoom';
+import { useRoom } from '../useRoom';
 
 interface CodeMirrorEditorProps {
   language: string;

@@ -11,7 +11,7 @@ import { useToast } from '@/components/ui/toast/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSession } from '@/context/useSession';
 
-import { useRoom } from './useRoom';
+import { useRoom } from '../useRoom';
 
 enum VideoState {
   LOADING,

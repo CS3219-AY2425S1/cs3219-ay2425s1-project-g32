@@ -51,10 +51,14 @@ func (qc QuestionController) CreateQuestion(w http.ResponseWriter, r *http.Reque
 }
 
 func (qc QuestionController) ListQuestions(w http.ResponseWriter, r *http.Request) {
-	// parse pagination/filter if need
+	// parse filter
+	complexity := r.URL.Query().Get("complexity")
+	category := r.URL.Query().Get("category")
+
+	// parse pagination if need
 
 	// Get from DB
-	questions, err := qc.questionRepository.ListQuestions()
+	questions, err := qc.questionRepository.ListQuestions(complexity, category)
 	if err != nil {
 		log.Printf("Error getting all question")
 		w.WriteHeader(http.StatusInternalServerError)

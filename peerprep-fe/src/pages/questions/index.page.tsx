@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 
+import { getQuestions } from '@/api/question';
 import CreateQuestionModal from '@/components/questions/CreateQuestionModal';
 import QuestionTableRow from '@/components/questions/QuestionTableRow';
 import Skeleton from '@/components/ui/skeleton';
@@ -7,7 +8,6 @@ import { TableHeader, TableRow, TableHead, TableBody, Table } from '@/components
 import { useToast } from '@/components/ui/toast/use-toast';
 import { type Question } from '@/types/question';
 import { Role } from '@/types/user';
-import { api } from '@/utils/api';
 
 const QuestionsPage = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -19,22 +19,18 @@ const QuestionsPage = () => {
     setIsMounted(true);
   }, []);
 
-  const fetchQuestions = async () => {
-    setLoading(true);
-    try {
-      const data = await api<Question[]>(
-        `${process.env.NEXT_PUBLIC_QUESTIONS_BACKEND_URL || ''}/question`
-      );
-      setQuestions(data);
-    } catch (e) {
-      toast({ variant: 'destructive', description: 'Error fetching questions' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchQuestions();
+    (async () => {
+      setLoading(true);
+      try {
+        const data = await getQuestions('', '');
+        setQuestions(data);
+      } catch (e) {
+        toast({ variant: 'destructive', description: 'Error fetching questions' });
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [toast]);
 
   const handleDelete = async (id: string) => {

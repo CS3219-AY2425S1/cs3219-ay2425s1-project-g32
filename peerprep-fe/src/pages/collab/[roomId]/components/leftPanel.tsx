@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import { useState } from 'react';
 
 import { Laptop2, Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
@@ -25,18 +25,9 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/compone
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import Chat from './chat';
+import Question from './question';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface Props {}
-
-const question = {
-  title: 'Question Title',
-  description:
-    'Question Details Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sit amet lorem at nisi vehicula sagittis. Nullam a venenatis mi. Aliquam faucibus ipsum orci, ut varius ante laoreet ac...',
-};
-
-// eslint-disable-next-line arrow-body-style
-const LeftPanel: FC<Props> = () => {
+const LeftPanel = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const { setTheme } = useTheme();
   const onEndSession = () => {
@@ -50,17 +41,13 @@ const LeftPanel: FC<Props> = () => {
         </SidebarHeader>
         <SidebarContent>
           <div className="h-full overflow-scroll rounded-md bg-background p-4 shadow-md">
-            <Tabs defaultValue="chat">
+            <Tabs defaultValue="question">
               <TabsList>
                 <TabsTrigger value="question">Question</TabsTrigger>
                 <TabsTrigger value="chat">Chat</TabsTrigger>
               </TabsList>
               <TabsContent value="question">
-                <div className="mb-2 text-2xl font-bold">{question.title}</div>
-                <div className="mb-4 text-gray-600">{question.description}</div>
-                <div className="mb-4 flex h-40 items-center justify-center rounded border border-gray-300 p-4">
-                  <div>Graph Visualization Placeholder</div>
-                </div>
+                <Question />
               </TabsContent>
               <TabsContent value="chat">
                 <Chat />

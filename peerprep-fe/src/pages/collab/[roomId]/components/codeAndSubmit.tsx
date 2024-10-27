@@ -20,7 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useSession } from '@/context/useSession';
 
-import CodeEditor from './codeEditor';
+import CodeMirrorEditor from './codeEditor';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface Props {}
@@ -128,7 +128,7 @@ const CodeAndSubmit: FC<Props> = () => {
         </div>
 
         <div className="flex-grow overflow-hidden rounded-lg">
-          <CodeEditor language={language} theme={theme} onCodeChange={setCode} />
+          <CodeMirrorEditor language={language} theme={theme} onCodeChange={setCode} />
         </div>
         {executable && (
           <div className="mt-4 flex justify-end">

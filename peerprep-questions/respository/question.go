@@ -33,7 +33,7 @@ func (qr QuestionRepository) CreateQuestion(question model.Question) (*mongo.Ins
 	return result, nil
 }
 
-func (qr QuestionRepository) ListQuestions() ([]model.Question, error) {
+func (qr QuestionRepository) ListQuestions(complexity, category string) ([]model.Question, error) {
 	collection := db.GetCollection(qr.mongoClient, "questions")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -43,8 +43,18 @@ func (qr QuestionRepository) ListQuestions() ([]model.Question, error) {
 	// opts.SetSkip(int64((page - 1) * limit)) // Calculate the number of documents to skip
 	// opts.SetLimit(int64(limit))              // Limit the number of documents returned
 
+	// setup filter
+	filter := bson.M{}
+	if complexity != "" {
+		filter["complexity"] = complexity
+	}
+	if category != "" {
+		filter["category"] = category
+	}
+
 	// Find the questions with the given filter
-	cursor, err := collection.Find(ctx, bson.M{})
+	cursor, err := collection.Find(ctx, filter)
+
 	// cursor, err := collection.Find(ctx, filter, opts)
 	if err != nil {
 		return nil, err
