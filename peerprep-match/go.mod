@@ -1,12 +1,12 @@
 module github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/peerprep-match
 
-go 1.22.1
+go 1.23.1
 
 require (
+	github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/common v0.0.0-20241027053231-cca0534c6eef
 	github.com/go-chi/chi v1.5.5
 	github.com/joho/godotenv v1.5.1
 	github.com/rs/cors v1.11.1
-	github.com/streadway/amqp v1.1.0
 	go.mongodb.org/mongo-driver v1.17.1
 )
 
@@ -14,6 +14,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
+	github.com/streadway/amqp v1.1.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect

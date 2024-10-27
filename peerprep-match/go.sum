@@ -1,3 +1,5 @@
+github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/common v0.0.0-20241027053231-cca0534c6eef h1:alZzMAzwzHMKncffsOdykuIQHB6+Jv7zFUPTvq7fOS0=
+github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g32/common v0.0.0-20241027053231-cca0534c6eef/go.mod h1:COU4vFwCSW2fTrWwhrypbwIQiF2k/lTvrONGt2pLbNw=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-chi/chi v1.5.5 h1:vOB/HbEMt9QqBqErz07QehcOKHaWFtuj87tTDVz2qXE=
