@@ -18,14 +18,14 @@ func main() {
 	// connect to db
 	mongoClient := db.ConnectDB()
 	// connect to messagequeue
-	mqConn, err := rabbitmq.ConnectRabbitMQ("MATCHING_RMQ_URI", "MATCHING_QUEUE")
+	matchingMqConn, err := rabbitmq.ConnectRabbitMQ("MATCHING_RMQ_URI", "MATCHING_QUEUE")
 	if err != nil {
 		log.Fatalf("Failed to connect to rabbitmq: %v", err)
 		return
 	}
-	mqConn.DeclareQueue()
+	matchingMqConn.DeclareQueue()
 	questionRepository := repository.NewRepository(mongoClient)
-	controller := controller.NewMatchController(questionRepository, mqConn)
+	controller := controller.NewMatchController(questionRepository, matchingMqConn)
 
 	r := chi.NewRouter()
 	c := cors.New(cors.Options{
