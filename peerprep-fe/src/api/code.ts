@@ -30,7 +30,6 @@ export const runCode = async (language: string, code: string, token: string) => 
   });
 
   const data: unknown = await res.json();
-  console.log(data);
   if (!res.ok) {
     throw Error((data as BaseResponse).message);
   }

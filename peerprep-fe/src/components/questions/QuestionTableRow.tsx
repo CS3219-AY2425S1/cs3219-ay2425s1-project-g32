@@ -3,6 +3,7 @@ import Label from '@/components/ui/label';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { type Question } from '@/types/question';
 
+import Difficulty from './Difficulty';
 import EditQuestionModal from './EditQuestionModal';
 
 interface QuestionTableRowProps {
@@ -10,24 +11,6 @@ interface QuestionTableRowProps {
   onDelete: (id: string) => void;
   onEdit: (id: string, values: Omit<Question, 'id'>) => Promise<void>;
 }
-
-const Difficulty = ({ difficulty }: { difficulty: string }) => {
-  let className = '';
-  switch (difficulty) {
-    case 'Easy':
-      className = 'text-green-600';
-      break;
-    case 'Medium':
-      className = 'text-orange-500';
-      break;
-    case 'Hard':
-      className = 'text-red-600';
-      break;
-    default:
-      break;
-  }
-  return <div className={className}>{difficulty}</div>;
-};
 
 const QuestionTableRow: React.FC<QuestionTableRowProps> = ({ question, onDelete, onEdit }) => {
   return (

@@ -21,6 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdownMenu';
+import Separator from '@/components/ui/separator';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -36,9 +37,13 @@ const LeftPanel = () => {
   return (
     <>
       <Sidebar>
-        <SidebarHeader className="p-5 text-lg font-bold">
-          <Link href="/">Peerprep</Link>
+        <SidebarHeader className="p-5">
+          <Link href="/">
+            <div className="text-lg font-bold">Peerprep</div>
+          </Link>
+          <div>Session with Paul</div>
         </SidebarHeader>
+        <Separator />
         <SidebarContent>
           <div className="h-full overflow-scroll rounded-md bg-background p-4 shadow-md">
             <Tabs defaultValue="question">
@@ -56,7 +61,7 @@ const LeftPanel = () => {
           </div>
         </SidebarContent>
         <SidebarFooter>
-          <div className="flex gap-x-4">
+          <div className="flex justify-between">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon">
@@ -80,12 +85,14 @@ const LeftPanel = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Link href="/">
-              <Button className="w-full">Return home</Button>
-            </Link>
-            <Button variant="destructive" onClick={() => setShowConfirm(true)}>
-              End Session
-            </Button>
+            <div className="flex gap-x-4">
+              <Link href="/">
+                <Button className="w-full">Return home</Button>
+              </Link>
+              <Button variant="destructive" onClick={() => setShowConfirm(true)}>
+                End Session
+              </Button>
+            </div>
           </div>
         </SidebarFooter>
       </Sidebar>
