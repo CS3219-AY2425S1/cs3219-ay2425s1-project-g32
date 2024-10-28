@@ -2,13 +2,16 @@ import { createServer } from "http";
 import express, { json } from "express";
 import { WebSocketServer } from "ws";
 import { authenticateToken, auth } from "./middleware/auth.js";
-import { onConnection } from "./controller/collab-controller.js";
+import { onConnection, consumeMessages } from "./controller/collab-controller.js";
 import collabRoutes from "./routes/collab-routes.js";
 import codeRoutes from "./routes/code-routes.js";
-import "dotenv/config";
+import dotenv from 'dotenv'
 
 const app = express();
 const port = 1234;
+dotenv.config();
+const rmq_uri = process.env.COLLAB_RMQ_URI
+const rmq_queue_name = process.env.COLLAB_QUEUE
 
 app.use(json());
 const server = createServer(app);
@@ -66,4 +69,5 @@ wss.on("connection", onConnection);
 // Start the server
 server.listen(port, () => {
   console.log(`WebSocket server running on ws://localhost:${port}`);
+  consumeMessages(rmq_uri, rmq_queue_name);
 });

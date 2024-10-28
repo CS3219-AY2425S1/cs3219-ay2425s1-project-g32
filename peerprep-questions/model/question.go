@@ -16,3 +16,8 @@ type UpdateQuestionRequest struct {
 	Category    []string `json:"category"`
 	Complexity  string   `json:"complexity"`
 }
+
+type RandomQuestionRequest struct {
+	Category   string `json:"category"`
+	Complexity string `json:"complexity"`
+}

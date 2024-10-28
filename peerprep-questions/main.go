@@ -34,6 +34,7 @@ func main() {
 		r.Put("/{id}", questionController.UpdateQuestion)
 		r.Delete("/{id}", questionController.DeleteQuestion)
 		r.Get("/{id}", questionController.GetQuestion)
+		r.Post("/get-random", questionController.GetRandomQuestion)
 	})
 	log.Println("Running on port 3001")
 	http.ListenAndServe(":3001", r)

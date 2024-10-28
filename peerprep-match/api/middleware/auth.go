@@ -70,6 +70,12 @@ func validateToken(jwtToken string) *User {
 
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Check if the request comes with a trusted microservice secret
+		// #TODO could be handled better or in the api gateway
+		if r.Header.Get("X-Microservice-Secret") == os.Getenv("MICROSERVICE_SECRET") {
+			next.ServeHTTP(w, r)
+			return
+		}
 		if r.Method == http.MethodOptions {
 			next.ServeHTTP(w, r)
 			return

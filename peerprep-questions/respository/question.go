@@ -130,3 +130,40 @@ func (qr QuestionRepository) UpdateQuestion(id string, updateRequest model.Updat
 
 	return &updatedQuestion, nil
 }
+
+func (qr QuestionRepository) GetRandomQuestion(category string, complexity string) (string, error) {
+	collection := db.GetCollection(qr.mongoClient, "questions")
+
+	matchFilter := bson.D{}
+
+	if complexity != "All" && complexity != "" {
+		matchFilter = append(matchFilter, bson.E{"complexity", complexity})
+	}
+
+	if category != "All" && category != "" {
+		matchFilter = append(matchFilter, bson.E{"category", bson.D{{"$elemMatch", bson.D{{"$eq", category}}}}})
+	}
+
+	pipeline := mongo.Pipeline{
+		{{"$match", matchFilter}},
+		{{"$sample", bson.D{{"size", 1}}}}, // Randomly select one matching document
+	}
+
+	cursor, err := collection.Aggregate(context.Background(), pipeline)
+	if err != nil {
+		return "", err
+	}
+	defer cursor.Close(context.Background())
+
+	var result struct {
+		ID primitive.ObjectID `bson:"_id"`
+	}
+	if cursor.Next(context.Background()) {
+		if err := cursor.Decode(&result); err != nil {
+			return "", err
+		}
+		return result.ID.Hex(), nil
+	}
+
+	return "", nil
+}

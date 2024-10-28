@@ -117,7 +117,7 @@ func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
 	var status string
 	if req.HasMatch {
 		if req.IsRoomCreated {
-			status = "Matched"
+			status = "RoomActive"
 		} else {
 			status = "CreatingRoom"
 		}

@@ -42,8 +42,19 @@ const FormSchema = z.object({
   topic: z.string().min(1, 'Select a topic'),
 });
 
-const DIFFICULTIES = ['all', 'easy', 'medium', 'hard'];
-const TOPICS = ['all', 'dynamic programming', 'tree', 'string', 'arrays'];
+const DIFFICULTIES = ['All', 'Easy', 'Medium', 'Hard'];
+const TOPICS = [
+  'All',
+  'Dynamic Programming',
+  'Strings',
+  'Arrays',
+  'Bit Manipulation',
+  'Algorithms',
+  'Brainteaser',
+  'Data Structures',
+  'Databases',
+];
+
 const POLL_INTERVAL = 3000; // Poll every 5 seconds
 
 const FindMatchPage = () => {

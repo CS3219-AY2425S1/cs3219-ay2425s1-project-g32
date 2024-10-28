@@ -130,6 +130,29 @@ func (qc QuestionController) GetQuestion(w http.ResponseWriter, r *http.Request)
 		}
 		return
 	}
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(question)
+}
+
+func (qc QuestionController) GetRandomQuestion(w http.ResponseWriter, r *http.Request) {
+	var req model.RandomQuestionRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("Finding random question with category %s and complexity %s", req.Category, req.Complexity)
+	questionId, err := qc.questionRepository.GetRandomQuestion(req.Category, req.Complexity)
+
+	if err != nil {
+		http.Error(w, "Unable to get question", http.StatusInternalServerError)
+	}
+	if questionId == "" {
+		log.Printf("Unable to find question with category %s and complexity %s", req.Category, req.Complexity)
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{}`)) // Returning an empty JSON object
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(questionId)
 }

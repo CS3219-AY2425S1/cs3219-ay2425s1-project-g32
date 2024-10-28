@@ -33,11 +33,11 @@ func GetFilter(filter model.GetMatchFilter) (bson.M, error) {
 		f["_id"] = questionId
 	}
 
-	if filter.Category != "" {
+	if filter.Category != "" && filter.Category != "All" {
 		f["category"] = filter.Category
 	}
 
-	if filter.Complexity != "" {
+	if filter.Complexity != "" && filter.Complexity != "All" {
 		f["complexity"] = filter.Complexity
 	}
 
@@ -185,8 +185,16 @@ func (qr MatchRepository) CreateMatch(match model.Match) (*mongo.InsertOneResult
 }
 
 func (mr MatchRepository) UpdateRoomCreated(req model.RoomCreatedReq) error {
-	id1, _ := primitive.ObjectIDFromHex(req.MatchId1)
-	id2, _ := primitive.ObjectIDFromHex(req.MatchId2)
+	id1, err := primitive.ObjectIDFromHex(req.MatchId1)
+	if err != nil {
+		log.Printf("Invalid MatchId1: %v\n", err)
+		return err
+	}
+	id2, err := primitive.ObjectIDFromHex(req.MatchId2)
+	if err != nil {
+		log.Printf("Invalid MatchId2: %v\n", err)
+		return err
+	}
 	filter := bson.M{"_id": bson.M{"$in": []primitive.ObjectID{id1, id2}}}
 	collection := db.GetCollection(mr.mongoClient, "matches")
 	update := bson.M{
@@ -196,6 +204,7 @@ func (mr MatchRepository) UpdateRoomCreated(req model.RoomCreatedReq) error {
 	}
 	res, err := collection.UpdateMany(context.Background(), filter, update)
 	if err != nil {
+		log.Printf("Error updating room created - %s", err)
 		return err
 	}
 	log.Printf("%d records modified for room creation", res.ModifiedCount)
