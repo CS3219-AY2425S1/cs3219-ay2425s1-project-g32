@@ -122,12 +122,20 @@ const FindMatchPage = () => {
       }
 
       try {
-        const status = await pollMatchingStatus(matchRequestId, sessionData.accessToken);
+        const { status, room_id: roomId } = await pollMatchingStatus(
+          matchRequestId,
+          sessionData.accessToken
+        );
         switch (status) {
           case PollStatus.MATCHED: {
+            if (!roomId) {
+              // id should not be null here assert it
+              throw new Error('Something went wrong with the server');
+            }
+
             setMatchRequestId('');
             toast({ description: 'Found a match, redirecting you to collaborative page' });
-            router.push('/code/123');
+            router.push(`/code/${roomId}`);
             break;
           }
           case PollStatus.ROOM_ACTIVE: {

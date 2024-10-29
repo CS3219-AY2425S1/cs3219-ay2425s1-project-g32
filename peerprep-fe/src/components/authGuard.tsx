@@ -37,6 +37,8 @@ export const canVisit = (
 
   if (config.role === Role.USER) return true;
 
+  if (config.role === Role.ADMIN && user.isAdmin) return true;
+
   return config.role === user.role;
 };
 
@@ -59,7 +61,12 @@ const AuthGuard: FC<PropsWithChildren<Props>> = ({ children, config }) => {
 
       return;
     }
-    if (config.role === Role.ADMIN && sessionData.user.role === Role.USER) {
+    console.log(sessionData);
+    if (
+      config.role === Role.ADMIN &&
+      !sessionData.user.isAdmin &&
+      sessionData.user.role === Role.USER
+    ) {
       void router.push({
         pathname: '/403',
       });

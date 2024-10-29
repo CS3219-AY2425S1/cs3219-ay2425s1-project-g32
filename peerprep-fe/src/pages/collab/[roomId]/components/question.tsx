@@ -48,7 +48,7 @@ Car with the maximum speed of 251 km/h`,
 const Question = () => {
   const [question, setQuestion] = useState<QuestionType>();
   const { toast } = useToast();
-  const questionId = '66f81429929fa07cb66812c7'; // TODO: Get from backend
+  const questionId = '66f81429929fa07cb66812b8'; // TODO: Get from backend
 
   useEffect(() => {
     (async () => {

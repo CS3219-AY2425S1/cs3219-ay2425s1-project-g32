@@ -30,7 +30,7 @@ import Chat from './chat';
 import Question from './question';
 
 const LeftPanel = () => {
-  const [tab, setTab] = useState('chat');
+  const [tab, setTab] = useState('question');
   const [showConfirm, setShowConfirm] = useState(false);
   const { setTheme } = useTheme();
   const onEndSession = () => {

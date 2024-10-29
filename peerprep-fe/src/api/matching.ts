@@ -21,7 +21,7 @@ export enum PollStatus {
 
 export interface MatchingPollBackendResponse {
   status: string;
-  id: string;
+  room_id: string;
 }
 
 // Request to perform a matching operation
@@ -61,7 +61,7 @@ export const pollMatchingStatus = async (matchRequestId: string, token: string) 
 
   const { status } = data as MatchingPollBackendResponse;
   if (Object.values(PollStatus).includes(status as PollStatus)) {
-    return status as PollStatus;
+    return data as MatchingPollBackendResponse;
   }
 
   throw Error('error occured');
