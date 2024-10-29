@@ -2,8 +2,10 @@ import { useState } from 'react';
 
 import { Laptop2, Moon, Sun } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useTheme } from 'next-themes';
 
+import { endSession } from '@/api/code';
 import {
   AlertDialogHeader,
   AlertDialogFooter,
@@ -25,17 +27,31 @@ import Label from '@/components/ui/label';
 import Separator from '@/components/ui/separator';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/components/ui/toast/use-toast';
+import { useSession } from '@/context/useSession';
 
 import Chat from './chat';
 import Question from './question';
 
 const LeftPanel = () => {
+  const router = useRouter();
+  const { roomId } = router.query;
   const [tab, setTab] = useState('question');
   const [showConfirm, setShowConfirm] = useState(false);
   const { setTheme } = useTheme();
-  const onEndSession = () => {
+  const { sessionData } = useSession();
+  const { toast } = useToast();
+
+  const onEndSession = async () => {
     // TODO: Need to call end
+    if (!sessionData || !roomId) return;
+    try {
+      await endSession(roomId as string, sessionData.accessToken);
+    } catch {
+      toast({ variant: 'destructive', description: 'Something wentw rong in the server' });
+    }
   };
+
   return (
     <>
       <Sidebar>

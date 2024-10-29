@@ -54,3 +54,19 @@ export const getRoom = async (roomId: string, token: string) => {
 
   return data as Room;
 };
+
+export const endSession = async (roomId: string, token: string) => {
+  const res = await api(`collab/end-session`, {
+    method: 'POST',
+    body: JSON.stringify({ roomId }),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data: unknown = await res.json();
+  if (!res.ok) {
+    throw Error((data as BaseResponse).message);
+  }
+};
