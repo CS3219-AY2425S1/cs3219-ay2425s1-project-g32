@@ -127,7 +127,7 @@ const FindMatchPage = () => {
           sessionData.accessToken
         );
         switch (status) {
-          case PollStatus.MATCHED: {
+          case PollStatus.ROOM_ACTIVE: {
             if (!roomId) {
               // id should not be null here assert it
               throw new Error('Something went wrong with the server');
@@ -138,7 +138,7 @@ const FindMatchPage = () => {
             router.push(`/code/${roomId}`);
             break;
           }
-          case PollStatus.ROOM_ACTIVE: {
+          case PollStatus.MATCHING: {
             break;
           }
           case PollStatus.CANCELLED:

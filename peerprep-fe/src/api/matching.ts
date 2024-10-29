@@ -12,8 +12,8 @@ export interface MatchingBackendResponse {
 }
 
 export enum PollStatus {
+  MATCHING = 'Matching',
   ROOM_ACTIVE = 'RoomActive',
-  MATCHED = 'Matched',
   CANCELLED = 'Cancelled',
   TIMEOUT = 'Timeout',
   CREATING_ROOM = 'CreatingRoom',
