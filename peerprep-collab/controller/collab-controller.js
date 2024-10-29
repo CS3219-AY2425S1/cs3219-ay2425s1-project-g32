@@ -80,7 +80,7 @@ const createRoomRecord = async (data, questionId) => {
 
 const updateRoomCreated = async (match_id1, match_id2, room_id) => {
   try {
-    console.log(`Updating matching service for ids ${match_id1} and ${match_id2}`)
+    console.log(`Updating matching service for ids ${match_id1} and ${match_id2}, with room_id ${room_id}`)
     const response = await axios.post(`${matching_url}/match/room-created`, {
           match_id1: match_id1,
           match_id2: match_id2,
