@@ -93,9 +93,10 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
         setOtherUser(user.data);
       } catch (e) {
         toast({ variant: 'destructive', description: 'Error fetching other user data' });
+        router.push('/');
       }
     },
-    [toast]
+    [toast, router]
   );
 
   useEffect(() => {
@@ -145,13 +146,13 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
     if (wsProvider.ws) {
       wsProvider.ws.onclose = (event) => {
         toast({ variant: 'destructive', description: event.reason });
-        // router.push('/');
+        router.push('/');
       };
       setProvider(wsProvider);
     } else {
       toast({ variant: 'destructive', description: 'Something went wrong' });
     }
-  }, [roomId, sessionData, toast, ydoc, ytext, handle]);
+  }, [roomId, sessionData, toast, ydoc, ytext, handle, router]);
 
   const value = useMemo(
     () => ({ otherUser, room, provider, ytext }),
