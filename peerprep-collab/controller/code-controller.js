@@ -4,7 +4,10 @@ import { promisify } from 'util';
 import { randomBytes } from 'crypto';
 import path from 'path';
 
-const docker = new Docker();
+const docker = new Docker({protocol:'https', host: '127.0.0.1', port: 2376,
+    ca: fs.readFileSync('/certs/client/ca.pem'),
+    cert: fs.readFileSync('/certs/client/cert.pem'),
+    key: fs.readFileSync('/certs/client/key.pem'),});
 const writeFile = promisify(fs.writeFile);
 const unlink = promisify(fs.unlink);
 
@@ -14,6 +17,29 @@ class ContainerTimeoutError extends Error {
         this.name = "ContainerTimeoutError";
     }
 }
+
+const dockerPull = (repoTag) => {
+    return new Promise((resolve, reject) => {
+      docker.pull(repoTag, (err, stream) => {
+        if (err) {
+          return reject(err);
+        }
+  
+        // Use dockerode's built-in modem to follow the stream
+        docker.modem.followProgress(stream, onFinished, onProgress);
+  
+        function onFinished(err, output) {
+          if (err) {
+            return reject(err);
+          }
+          resolve(output);
+        }
+  
+        function onProgress(event) {
+        }
+      });
+    });
+  };
 
 export const runCode = async (req, res) => {
     const { language, code } = req.body;
@@ -64,7 +90,7 @@ export const runCode = async (req, res) => {
     }
 
     const fileName = `temp_${randomString}.${extension}`;
-    const filePath = path.join('/tmp/collab', fileName);
+    const filePath = path.join('/tmp', fileName);
 
     try {
         let output = '';
@@ -74,7 +100,7 @@ export const runCode = async (req, res) => {
 
         // Pull the Docker image if it's not already present
         // TODO: should try pulling all images already on host container startup
-        await docker.pull(imageName);
+        await dockerPull(imageName);
 
         const container = await docker.createContainer({
             Image: imageName,

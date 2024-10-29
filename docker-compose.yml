@@ -27,7 +27,7 @@ services:
       - "15672:15672"
       - "5672:5672"
     healthcheck:
-      test: ["CMD", "rabbitmqctl", "ping"]
+      test: [ "CMD", "rabbitmqctl", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -64,7 +64,4 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /tmp/collab:/tmp/collab
     privileged: true
