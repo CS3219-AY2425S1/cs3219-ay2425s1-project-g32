@@ -1,15 +1,15 @@
 import { setupWSConnection } from "y-websocket/bin/utils";
-import amqp from 'amqplib';
-import axios from 'axios';
-import dotenv from 'dotenv'
-import connectDB  from "../db/database.js";
-import { ObjectId } from 'mongodb'
+import amqp from "amqplib";
+import axios from "axios";
+import dotenv from "dotenv";
+import connectDB from "../db/database.js";
+import { ObjectId } from "mongodb";
 import { transpileModule } from "typescript";
 
 dotenv.config();
 
-const questions_url = process.env.QUESTIONS_BACKEND_URL
-const matching_url = process.env.MATCHING_BACKEND_URL
+const questions_url = process.env.QUESTIONS_BACKEND_URL;
+const matching_url = process.env.MATCHING_BACKEND_URL;
 
 const userInRoom = (user, room) => {
   return true;
@@ -44,22 +44,25 @@ export const onConnection = (ws, req, user) => {
 export const getQuestionId = async (category, complexity) => {
   try {
     const response = await axios.post(`${questions_url}/question/get-random`, {
-          category: category,
-          complexity: complexity,
+      category: category,
+      complexity: complexity,
     });
 
     const questionId = response.data;
     console.log(`Got question id ${questionId}`);
     return questionId;
   } catch (error) {
-    console.error("Error fetching question from question service:", error.message);
+    console.error(
+      "Error fetching question from question service:",
+      error.message
+    );
     return null;
   }
-}
+};
 
 const createRoomRecord = async (data, questionId) => {
   const db = await connectDB();
-  const roomsCollection = db.collection('rooms');
+  const roomsCollection = db.collection("rooms");
 
   const room = {
     user_id1: data.user_id1,
@@ -70,33 +73,41 @@ const createRoomRecord = async (data, questionId) => {
     complexity: data.complexity,
     question_id: questionId,
     created_at: new Date(),
-    status: "active"
-  }
+    status: "active",
+  };
 
   const res = await roomsCollection.insertOne(room);
-  console.log('Room record created in MongoDB with ID:', res.insertedId);
-  return res.insertedId
-}
+  console.log("Room record created in MongoDB with ID:", res.insertedId);
+  return res.insertedId;
+};
 
 const updateRoomCreated = async (match_id1, match_id2, room_id) => {
   try {
-    console.log(`Updating matching service for ids ${match_id1} and ${match_id2}, with room_id ${room_id}`)
-    const response = await axios.post(`${matching_url}/match/room-created`, {
-          match_id1: match_id1,
-          match_id2: match_id2,
-          room_id: room_id,
-    },
-    {
-      headers: {
-        'X-Microservice-Secret': process.env.MICROSERVICE_SECRET,
-      },     
-    });
+    console.log(
+      `Updating matching service for ids ${match_id1} and ${match_id2}, with room_id ${room_id}`
+    );
+    const response = await axios.post(
+      `${matching_url}/match/room-created`,
+      {
+        match_id1: match_id1,
+        match_id2: match_id2,
+        room_id: room_id,
+      },
+      {
+        headers: {
+          "X-Microservice-Secret": process.env.MICROSERVICE_SECRET,
+        },
+      }
+    );
     return true;
   } catch (error) {
-    console.error("Error updating matching service over created room", error.message);
+    console.error(
+      "Error updating matching service over created room",
+      error.message
+    );
     return false;
   }
-}
+};
 
 const createSession = async (data) => {
   // get a random question that satisfies the requirements
@@ -115,62 +126,72 @@ export const consumeMessages = async (rmq_uri, rmq_queue_name) => {
     console.log(`Waiting for messages in ${rmq_queue_name}`);
 
     channel.consume(rmq_queue_name, (message) => {
-      if (message!==null) {
+      if (message !== null) {
         const roomInfo = JSON.parse(message.content.toString());
-        console.log('Received room creation message: ', roomInfo)
+        console.log("Received room creation message: ", roomInfo);
 
         createSession(roomInfo);
       }
     });
   } catch (error) {
-    console.error('Failed to connect to RabbitMQ:', error);
+    console.error("Failed to connect to RabbitMQ:", error);
   }
-}
+};
 
 export const endSession = async (roomId) => {
   try {
-      const db = await connectDB();
-      const roomsCollection = db.collection('rooms');
+    const db = await connectDB();
+    const roomsCollection = db.collection("rooms");
 
-      // Update the room status to "completed" and retrieve match_id1 and match_id2
-      const result = await roomsCollection.findOneAndUpdate(
-          { _id: new ObjectId(roomId) },
-          { $set: { status: "completed" } },
-          { returnDocument: 'after' }
-      );
+    // Update the room status to "completed" and retrieve match_id1 and match_id2
+    const result = await roomsCollection.findOneAndUpdate(
+      { _id: new ObjectId(roomId) },
+      { $set: { status: "completed" } },
+      { returnDocument: "after" }
+    );
 
-      if (!result.value) {
-          console.log(`No room found with id: ${roomId}`);
-          return { message: "Room not found", success: false };
-      }
+    if (!result.value) {
+      console.log(`No room found with id: ${roomId}`);
+      return { message: "Room not found", success: false };
+    }
 
-      const { match_id1, match_id2 } = result.value;
+    const { match_id1, match_id2 } = result.value;
 
-      // Call the matching service's cancel API for each match_id
-      await Promise.all([
-          axios.post(`${matching_url}/cancel`, { match_id: match_id1 }, {
-            headers: {
-              'X-Microservice-Secret': process.env.MICROSERVICE_SECRET,
-            },     
-          }),
-          axios.post(`${matching_url}/cancel`, { match_id: match_id2 }, {
-            headers: {
-              'X-Microservice-Secret': process.env.MICROSERVICE_SECRET,
-            },     
-          })
-      ]);
+    // Call the matching service's cancel API for each match_id
+    await Promise.all([
+      axios.post(
+        `${matching_url}/cancel`,
+        { match_id: match_id1 },
+        {
+          headers: {
+            "X-Microservice-Secret": process.env.MICROSERVICE_SECRET,
+          },
+        }
+      ),
+      axios.post(
+        `${matching_url}/cancel`,
+        { match_id: match_id2 },
+        {
+          headers: {
+            "X-Microservice-Secret": process.env.MICROSERVICE_SECRET,
+          },
+        }
+      ),
+    ]);
 
-      console.log(`Room with id ${roomId} updated to "completed" and matches canceled`);
+    console.log(
+      `Room with id ${roomId} updated to "completed" and matches canceled`
+    );
   } catch (error) {
-      console.error('Error ending session and canceling matches:', error);
+    console.error("Error ending session and canceling matches:", error);
   }
 };
 
 export const getRoomDetails = async (roomId) => {
   try {
     const db = await connectDB();
-    const roomsCollection = db.collection('rooms');
-    
+    const roomsCollection = db.collection("rooms");
+
     const room = await roomsCollection.findOne({ _id: new ObjectId(roomId) });
 
     if (room) {
@@ -183,6 +204,6 @@ export const getRoomDetails = async (roomId) => {
       console.error(`No room found for id ${roomId}`);
     }
   } catch (error) {
-    console.error('Error fetching room details:', error);
+    console.error("Error fetching room details:", error);
   }
 };

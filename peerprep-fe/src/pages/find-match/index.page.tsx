@@ -135,7 +135,7 @@ const FindMatchPage = () => {
 
             setMatchRequestId('');
             toast({ description: 'Found a match, redirecting you to collaborative page' });
-            router.push(`/code/${roomId}`);
+            router.push(`/collab/${roomId}`);
             break;
           }
           case PollStatus.MATCHING: {
