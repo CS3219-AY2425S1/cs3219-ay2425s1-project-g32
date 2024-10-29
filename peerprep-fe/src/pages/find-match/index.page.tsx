@@ -130,7 +130,7 @@ const FindMatchPage = () => {
             router.push('/code/123');
             break;
           }
-          case PollStatus.MATCHING: {
+          case PollStatus.ROOM_ACTIVE: {
             break;
           }
           case PollStatus.CANCELLED:

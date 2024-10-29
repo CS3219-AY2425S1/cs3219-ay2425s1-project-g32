@@ -12,7 +12,7 @@ export interface MatchingBackendResponse {
 }
 
 export enum PollStatus {
-  MATCHING = 'Matching',
+  ROOM_ACTIVE = 'RoomActive',
   MATCHED = 'Matched',
   CANCELLED = 'Cancelled',
   TIMEOUT = 'Timeout',
@@ -21,6 +21,7 @@ export enum PollStatus {
 
 export interface MatchingPollBackendResponse {
   status: string;
+  id: string;
 }
 
 // Request to perform a matching operation
