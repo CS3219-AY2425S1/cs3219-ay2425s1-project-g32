@@ -64,7 +64,6 @@ services:
         depends_on:
             rabbitmq:
                 condition: service_healthy
-        privileged: true
 
     peerprep-code:
         build:
@@ -72,4 +71,6 @@ services:
             dockerfile: ./Dockerfile
         ports:
             - "4321:4321"
+        depends_on:
+            - peerprep-users
         privileged: true
