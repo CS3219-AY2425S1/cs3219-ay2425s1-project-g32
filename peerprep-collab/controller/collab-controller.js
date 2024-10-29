@@ -3,6 +3,7 @@ import amqp from 'amqplib';
 import axios from 'axios';
 import dotenv from 'dotenv'
 import connectDB  from "../db/database.js";
+import { ObjectId } from 'mongodb'
 import { transpileModule } from "typescript";
 
 dotenv.config();
@@ -74,14 +75,16 @@ const createRoomRecord = async (data, questionId) => {
 
   const res = await roomsCollection.insertOne(room);
   console.log('Room record created in MongoDB with ID:', res.insertedId);
+  return res.insertedId
 }
 
-const updateRoomCreated = async (match_id1, match_id2) => {
+const updateRoomCreated = async (match_id1, match_id2, room_id) => {
   try {
     console.log(`Updating matching service for ids ${match_id1} and ${match_id2}`)
     const response = await axios.post(`${matching_url}/match/room-created`, {
           match_id1: match_id1,
           match_id2: match_id2,
+          room_id: room_id,
     },
     {
       headers: {
@@ -98,8 +101,8 @@ const updateRoomCreated = async (match_id1, match_id2) => {
 const createSession = async (data) => {
   // get a random question that satisfies the requirements
   const questionId = await getQuestionId(data.category, data.complexity);
-  await createRoomRecord(data, questionId);
-  await updateRoomCreated(data.match_id1, data.match_id2);
+  const roomId = await createRoomRecord(data, questionId);
+  await updateRoomCreated(data.match_id1, data.match_id2, roomId);
 };
 
 export const consumeMessages = async (rmq_uri, rmq_queue_name) => {
@@ -160,5 +163,26 @@ export const endSession = async (roomId) => {
       console.log(`Room with id ${roomId} updated to "completed" and matches canceled`);
   } catch (error) {
       console.error('Error ending session and canceling matches:', error);
+  }
+};
+
+export const getRoomDetails = async (roomId) => {
+  try {
+    const db = await connectDB();
+    const roomsCollection = db.collection('rooms');
+    
+    const room = await roomsCollection.findOne({ _id: new ObjectId(roomId) });
+
+    if (room) {
+      return {
+        question_id: room.question_id,
+        user_id1: room.user_id1,
+        user_id2: room.user_id2,
+      };
+    } else {
+      console.error(`No room found for id ${roomId}`);
+    }
+  } catch (error) {
+    console.error('Error fetching room details:', error);
   }
 };
