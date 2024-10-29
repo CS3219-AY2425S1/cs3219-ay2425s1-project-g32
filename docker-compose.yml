@@ -1,67 +1,75 @@
 version: "3"
 services:
-  peerprep-fe:
-    build: ./peerprep-fe
-    ports:
-      - "3000:3000"
-    depends_on:
-      - peerprep-users
-      - peerprep-questions
+    peerprep-fe:
+        build: ./peerprep-fe
+        ports:
+            - "3000:3000"
+        depends_on:
+            - peerprep-users
+            - peerprep-questions
 
-  peerprep-questions:
-    build: ./peerprep-questions # Path to your peerprep-questions Dockerfile
-    ports:
-      - "3001:3001"
-    depends_on:
-      - peerprep-users
+    peerprep-questions:
+        build: ./peerprep-questions # Path to your peerprep-questions Dockerfile
+        ports:
+            - "3001:3001"
+        depends_on:
+            - peerprep-users
 
-  peerprep-users:
-    build: ./peerprep-users # Path to your peerprep-users Dockerfile
-    ports:
-      - "3002:3002"
+    peerprep-users:
+        build: ./peerprep-users # Path to your peerprep-users Dockerfile
+        ports:
+            - "3002:3002"
 
-  # for configuring a local rabbitmq instance
-  rabbitmq:
-    image: rabbitmq:3.13-management
-    ports:
-      - "15672:15672"
-      - "5672:5672"
-    healthcheck:
-      test: [ "CMD", "rabbitmqctl", "ping" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # for configuring a local rabbitmq instance
+    rabbitmq:
+        image: rabbitmq:3.13-management
+        ports:
+            - "15672:15672"
+            - "5672:5672"
+        healthcheck:
+            test: ["CMD", "rabbitmqctl", "ping"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
-  peerprep-match-api:
-    build:
-      context: ./peerprep-match
-      dockerfile: ./Dockerfile.api
-    ports:
-      - "3003:3003"
-    env_file:
-      - ./peerprep-match/.env
-    depends_on:
-      - peerprep-users
-      - rabbitmq
+    peerprep-match-api:
+        build:
+            context: ./peerprep-match
+            dockerfile: ./Dockerfile.api
+        ports:
+            - "3003:3003"
+        env_file:
+            - ./peerprep-match/.env
+        depends_on:
+            - peerprep-users
+            - rabbitmq
 
-  peerprep-match-worker:
-    build:
-      context: ./peerprep-match
-      dockerfile: ./Dockerfile.worker
-    env_file:
-      - ./peerprep-match/.env
-    depends_on:
-      - peerprep-users
-      - rabbitmq
+    peerprep-match-worker:
+        build:
+            context: ./peerprep-match
+            dockerfile: ./Dockerfile.worker
+        env_file:
+            - ./peerprep-match/.env
+        depends_on:
+            - peerprep-users
+            - rabbitmq
 
-  peerprep-collab:
-    build:
-      context: ./peerprep-collab
-      dockerfile: ./Dockerfile
-    ports:
-      - "1234:1234"
-      - "9000:9000"
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    privileged: true
+    peerprep-collab:
+        build:
+            context: ./peerprep-collab
+            dockerfile: ./Dockerfile
+        ports:
+            - "1234:1234"
+            - "9000:9000"
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+        privileged: true
+
+    peerprep-code:
+        build:
+            context: ./peerprep-code
+            dockerfile: ./Dockerfile
+        ports:
+            - "4321:4321"
+        privileged: true

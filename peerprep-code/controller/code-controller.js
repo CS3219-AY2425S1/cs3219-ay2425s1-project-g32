@@ -3,11 +3,14 @@ import fs from 'fs';
 import { promisify } from 'util';
 import { randomBytes } from 'crypto';
 import path from 'path';
+import { dockerPull, images } from '../utils/index.js';
 
-const docker = new Docker({protocol:'https', host: '127.0.0.1', port: 2376,
+const docker = new Docker({
+    protocol: 'https', host: '127.0.0.1', port: 2376,
     ca: fs.readFileSync('/certs/client/ca.pem'),
     cert: fs.readFileSync('/certs/client/cert.pem'),
-    key: fs.readFileSync('/certs/client/key.pem'),});
+    key: fs.readFileSync('/certs/client/key.pem'),
+});
 const writeFile = promisify(fs.writeFile);
 const unlink = promisify(fs.unlink);
 
@@ -17,29 +20,6 @@ class ContainerTimeoutError extends Error {
         this.name = "ContainerTimeoutError";
     }
 }
-
-const dockerPull = (repoTag) => {
-    return new Promise((resolve, reject) => {
-      docker.pull(repoTag, (err, stream) => {
-        if (err) {
-          return reject(err);
-        }
-  
-        // Use dockerode's built-in modem to follow the stream
-        docker.modem.followProgress(stream, onFinished, onProgress);
-  
-        function onFinished(err, output) {
-          if (err) {
-            return reject(err);
-          }
-          resolve(output);
-        }
-  
-        function onProgress(event) {
-        }
-      });
-    });
-  };
 
 export const runCode = async (req, res) => {
     const { language, code } = req.body;
@@ -56,32 +36,32 @@ export const runCode = async (req, res) => {
 
     switch (language) {
         case 'python':
-            imageName = 'python:3.9-slim';
+            imageName = images.PYTHON;
             command = ['python', '/app/main.py'];
             extension = 'py';
             break;
         case 'javascript':
-            imageName = 'node:23.1.0-slim';
+            imageName = images.JAVASCRIPT;
             command = ['node', '/app/main.js'];
             extension = 'js';
             break;
         case 'c':
-            imageName = 'gcc:14.2.0';
+            imageName = images.C;
             command = ['sh', '-c', 'gcc /app/main.c -o /app/main && /app/main'];
             extension = 'c';
             break;
         case 'c++':
-            imageName = 'gcc:14.2.0';
+            imageName = images.C;
             command = ['sh', '-c', 'g++ /app/main.cpp -o /app/main && /app/main'];
             extension = 'cpp';
             break;
         case 'go':
-            imageName = 'golang:1.16.5';
+            imageName = images.GO;
             command = ['go', 'run', '/app/main.go'];
             extension = 'go';
             break;
         case 'rust':
-            imageName = 'rust:1.82.0';
+            imageName = images.RUST;
             command = ['sh', '-c', 'rustc /app/main.rs -o /app/main && /app/main'];
             extension = 'rs';
             break;
@@ -100,7 +80,7 @@ export const runCode = async (req, res) => {
 
         // Pull the Docker image if it's not already present
         // TODO: should try pulling all images already on host container startup
-        await dockerPull(imageName);
+        await dockerPull(docker, imageName);
 
         const container = await docker.createContainer({
             Image: imageName,

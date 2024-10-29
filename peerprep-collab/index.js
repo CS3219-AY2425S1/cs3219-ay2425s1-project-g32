@@ -4,7 +4,6 @@ import { WebSocketServer } from "ws";
 import { authenticateToken, auth } from "./middleware/auth.js";
 import { onConnection, consumeMessages } from "./controller/collab-controller.js";
 import collabRoutes from "./routes/collab-routes.js";
-import codeRoutes from "./routes/code-routes.js";
 import dotenv from 'dotenv'
 
 const app = express();
@@ -38,7 +37,6 @@ app.use((req, res, next) => {
 
 app.use(auth);
 app.use("/collab", collabRoutes);
-app.use("/code", codeRoutes);
 
 // Handle WebSocket upgrades
 server.on("upgrade", async (request, socket, head) => {
