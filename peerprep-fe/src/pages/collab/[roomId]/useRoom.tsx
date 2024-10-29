@@ -13,10 +13,12 @@ import { useRouter } from 'next/router';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 
+import { getRoom } from '@/api/code';
 import { getUser } from '@/api/user';
 import { useToast } from '@/components/ui/toast/use-toast';
 import { useSession } from '@/context/useSession';
 
+import type { Room } from '@/types/room';
 import type { User } from '@/types/user';
 
 export interface RoomData {
@@ -31,6 +33,7 @@ export interface LocalStorageJWT {
 }
 
 type RoomContextType = {
+  room: Room | undefined;
   otherUser: User | null;
   provider: WebsocketProvider | null;
   ytext: Y.Text;
@@ -78,6 +81,7 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
   const [otherUser, setOtherUser] = useState<User | null>(null);
   const { sessionData } = useSession();
   const { toast } = useToast();
+  const [room, setRoom] = useState<Room>();
 
   const handle = useCallback(
     async (id: string, accessToken: string) => {
@@ -93,6 +97,19 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
     },
     [toast]
   );
+
+  useEffect(() => {
+    if (!sessionData || !roomId) return;
+
+    (async () => {
+      try {
+        const room = await getRoom(roomId as string, sessionData.accessToken);
+        setRoom(room);
+      } catch {
+        toast({ variant: 'destructive', description: 'Something went wrong' });
+      }
+    })();
+  }, [roomId, sessionData, toast]);
 
   useEffect(() => {
     if (!sessionData || !roomId) return;
@@ -136,7 +153,10 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
     }
   }, [roomId, sessionData, toast, ydoc, ytext, handle]);
 
-  const value = useMemo(() => ({ otherUser, provider, ytext }), [otherUser, provider, ytext]);
+  const value = useMemo(
+    () => ({ otherUser, room, provider, ytext }),
+    [otherUser, provider, ytext, room]
+  );
   return <RoomContext.Provider value={value}>{children}</RoomContext.Provider>;
 };
 

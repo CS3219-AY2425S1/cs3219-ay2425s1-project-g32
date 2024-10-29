@@ -1,6 +1,7 @@
+import type { Room } from '@/types/room';
+
 const api = (path: string, init?: RequestInit) => {
-  console.log(init);
-  return fetch(`${process.env.NEXT_PUBLIC_COLLAB_SERVICE_WEBSOCKET_URL || ''}/code`, init);
+  return fetch(`${process.env.NEXT_PUBLIC_COLLAB_SERVICE_HTTP_URL || ''}/${path}`, init);
 };
 
 export interface BaseResponse {
@@ -20,7 +21,7 @@ export interface RunCodeResponse {
 export const runCode = async (language: string, code: string, token: string) => {
   const reqBody: RunCodeRequest = { language, code };
 
-  const res = await api('', {
+  const res = await api('code', {
     method: 'POST',
     body: JSON.stringify(reqBody),
     headers: {
@@ -35,4 +36,21 @@ export const runCode = async (language: string, code: string, token: string) => 
   }
 
   return data as RunCodeResponse;
+};
+
+export const getRoom = async (roomId: string, token: string) => {
+  const res = await api(`collab/room-details/${roomId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data: unknown = await res.json();
+  if (!res.ok) {
+    throw Error((data as BaseResponse).message);
+  }
+
+  return data as Room;
 };

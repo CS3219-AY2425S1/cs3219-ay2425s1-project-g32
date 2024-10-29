@@ -11,8 +11,11 @@ import {
 } from '@/components/ui/accordian';
 import { Badge } from '@/components/ui/badge';
 import Separator from '@/components/ui/separator';
+import Skeleton from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/toast/use-toast';
 import Difficulty from '@/pages/questions/components/Difficulty';
+
+import { useRoom } from '../useRoom';
 
 import type { Question as QuestionType } from '@/types/question';
 
@@ -48,18 +51,40 @@ Car with the maximum speed of 251 km/h`,
 const Question = () => {
   const [question, setQuestion] = useState<QuestionType>();
   const { toast } = useToast();
-  const questionId = '66f81429929fa07cb66812b8'; // TODO: Get from backend
+  const { room } = useRoom();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (!room) {
+      return;
+    }
     (async () => {
       try {
-        const data = await getQuestion(questionId);
+        setLoading(true);
+        const data = await getQuestion(room.question_id);
         setQuestion(data);
       } catch {
         toast({ variant: 'destructive', description: 'Failed to retrieve question for collab' });
+      } finally {
+        setLoading(false);
       }
     })();
-  }, [toast]);
+  }, [toast, room]);
+
+  if (loading) {
+    return (
+      <div>
+        <Skeleton />
+        {[
+          ...Array.of(10)
+            .fill(0)
+            .map((_, idx) => idx),
+        ].map((i) => (
+          <Skeleton key={i} />
+        ))}
+      </div>
+    );
+  }
 
   if (!question) {
     return <div>No question</div>;

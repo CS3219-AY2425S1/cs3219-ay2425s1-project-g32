@@ -61,7 +61,7 @@ const AuthGuard: FC<PropsWithChildren<Props>> = ({ children, config }) => {
 
       return;
     }
-    console.log(sessionData);
+
     if (
       config.role === Role.ADMIN &&
       !sessionData.user.isAdmin &&
