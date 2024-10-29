@@ -53,6 +53,7 @@ type Match struct {
 	CreatedAt     primitive.DateTime `json:"created_at" bson:"created_at"`
 	IsCancelled   bool               `json:"is_cancelled" bson:"is_cancelled"`
 	IsRoomCreated bool               `json:"is_room_created" bson:"is_room_created"`
+	RoomId        string             `json:"room_id" bson:"room_id"`
 }
 
 type UpdateMatchRequest struct {
@@ -84,4 +85,5 @@ type CollabMessage struct {
 type RoomCreatedReq struct {
 	MatchId1 string `json:"match_id1"`
 	MatchId2 string `json:"match_id2"`
+	RoomId   string `json:"room_id"`
 }

@@ -197,9 +197,11 @@ func (mr MatchRepository) UpdateRoomCreated(req model.RoomCreatedReq) error {
 	}
 	filter := bson.M{"_id": bson.M{"$in": []primitive.ObjectID{id1, id2}}}
 	collection := db.GetCollection(mr.mongoClient, "matches")
+	log.Printf("Updating with room_id: %s", req.RoomId)
 	update := bson.M{
 		"$set": bson.M{
 			"is_room_created": true,
+			"room_id":         req.RoomId,
 		},
 	}
 	res, err := collection.UpdateMany(context.Background(), filter, update)

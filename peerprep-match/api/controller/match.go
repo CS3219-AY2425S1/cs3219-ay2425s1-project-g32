@@ -74,6 +74,7 @@ func (mc *MatchController) Match(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:     primitive.NewDateTimeFromTime(time.Now()),
 		IsCancelled:   false,
 		IsRoomCreated: false,
+		RoomId:        "",
 	}
 	res, _ := mc.matchRepository.CreateMatch(match)
 	reqId := res.InsertedID.(primitive.ObjectID)
@@ -114,10 +115,12 @@ func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var resp = make(map[string]string)
 	var status string
 	if req.HasMatch {
 		if req.IsRoomCreated {
 			status = "RoomActive"
+			resp["room_id"] = req.RoomId
 		} else {
 			status = "CreatingRoom"
 		}
@@ -130,10 +133,11 @@ func (mc *MatchController) Poll(w http.ResponseWriter, r *http.Request) {
 			status = "Matching"
 		}
 	}
+	resp["status"] = status
 
 	// Step 3: Return the status as JSON
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": status})
+	json.NewEncoder(w).Encode(resp)
 }
 
 func (mc *MatchController) Cancel(w http.ResponseWriter, r *http.Request) {
