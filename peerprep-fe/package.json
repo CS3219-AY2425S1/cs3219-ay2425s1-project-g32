@@ -41,6 +41,7 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cm6-theme-basic-light": "^0.2.0",
     "cm6-theme-material-dark": "^0.2.0",
     "cm6-theme-solarized-dark": "^0.2.0",
     "cm6-theme-solarized-light": "^0.2.0",

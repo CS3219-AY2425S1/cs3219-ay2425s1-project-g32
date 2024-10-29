@@ -47,6 +47,8 @@ const LeftPanel = () => {
     if (!sessionData || !roomId) return;
     try {
       await endSession(roomId as string, sessionData.accessToken);
+      router.push('/');
+      toast({ description: 'Session ended, goodbye' });
     } catch {
       toast({ variant: 'destructive', description: 'Something wentw rong in the server' });
     }

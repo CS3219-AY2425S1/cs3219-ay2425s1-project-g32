@@ -26,7 +26,7 @@ const CodeAndSubmit = () => {
   const { resolvedTheme } = useTheme();
   const [language, setLanguage] = useState<string>(LANGUAGES.PYTHON);
   const [theme, setTheme] = useState<string>(
-    resolvedTheme === 'dark' ? THEMES.SOLARIZED_DARK : THEMES.SOLARIZED_LIGHT
+    resolvedTheme === 'dark' ? THEMES.SOLARIZED_DARK : THEMES.LIGHT
   );
   const [code, setCode] = useState<string>('');
   const executable = useMemo(

@@ -15,6 +15,7 @@ import type { EditorView } from 'codemirror';
 
 export const THEMES: Record<string, string> = {
   ONE_DARK: 'One Dark',
+  LIGHT: 'Light',
   // https://github.com/craftzdog/cm6-themes/
   SOLARIZED_DARK: 'Solarized Dark',
   SOLARIZED_LIGHT: 'Solarized Light',
@@ -23,6 +24,7 @@ export const THEMES: Record<string, string> = {
 
 export const THEME_LOADERS = {
   [THEMES.ONE_DARK]: () => import('@codemirror/theme-one-dark').then(({ oneDark }) => oneDark),
+  [THEMES.LIGHT]: () => import('cm6-theme-basic-light').then(({ basicLight }) => basicLight),
   [THEMES.SOLARIZED_DARK]: () =>
     import('cm6-theme-solarized-dark').then(({ solarizedDark }) => solarizedDark),
   [THEMES.SOLARIZED_LIGHT]: () =>
