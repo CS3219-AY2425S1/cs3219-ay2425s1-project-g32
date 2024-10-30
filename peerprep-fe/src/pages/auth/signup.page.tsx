@@ -70,7 +70,7 @@ export default function Signup() {
   return (
     <div className="flex flex-grow flex-col items-center justify-center gap-y-8">
       <div className="text-4xl font-bold">PeerPrep</div>
-      <div className="w-72 rounded-lg bg-gray-100 p-4">
+      <div className="w-72 rounded-lg bg-muted p-4">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <FormField

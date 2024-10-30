@@ -68,6 +68,7 @@ const FindMatchPage = () => {
   const [time, setTime] = useState(0);
   const [displayHint, setDisplayHint] = useState(false);
   const { toast } = useToast();
+  const [cancelDisabled, setCancelDisabled] = useState(true);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -87,6 +88,7 @@ const FindMatchPage = () => {
     setTime(0);
     setMatchRequestId('');
     setDisplayHint(false);
+    setCancelDisabled(true);
 
     try {
       const res = await performMatching(
@@ -126,6 +128,7 @@ const FindMatchPage = () => {
           matchRequestId,
           sessionData.accessToken
         );
+        setCancelDisabled(false);
         switch (status) {
           case PollStatus.ROOM_ACTIVE: {
             if (!roomId) {
@@ -230,6 +233,7 @@ const FindMatchPage = () => {
                 }
                 setMatchRequestId('');
               }}
+              disabled={cancelDisabled}
             >
               Cancel search
             </Button>

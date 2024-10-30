@@ -108,9 +108,10 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
         setRoom(room);
       } catch {
         toast({ variant: 'destructive', description: 'Something went wrong' });
+        router.push('/');
       }
     })();
-  }, [roomId, sessionData, toast]);
+  }, [roomId, router, sessionData, toast]);
 
   useEffect(() => {
     if (!sessionData || !roomId) return;
@@ -144,8 +145,8 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
     wsProvider.awareness.on('change', handleChange);
 
     if (wsProvider.ws) {
-      wsProvider.ws.onclose = (event) => {
-        toast({ variant: 'destructive', description: event.reason });
+      wsProvider.ws.onclose = () => {
+        toast({ variant: 'destructive', description: 'Session stopped. Goodbye' });
         router.push('/');
       };
       setProvider(wsProvider);

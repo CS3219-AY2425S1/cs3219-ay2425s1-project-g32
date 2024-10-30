@@ -1,5 +1,9 @@
 import type { Room } from '@/types/room';
 
+const codeApi = (path: string, init?: RequestInit) => {
+  return fetch(`${process.env.NEXT_PUBLIC_CODE_SERVICE_HTTP_URL || ''}/${path}`, init);
+};
+
 const api = (path: string, init?: RequestInit) => {
   return fetch(`${process.env.NEXT_PUBLIC_COLLAB_SERVICE_HTTP_URL || ''}/${path}`, init);
 };
@@ -21,7 +25,7 @@ export interface RunCodeResponse {
 export const runCode = async (language: string, code: string, token: string) => {
   const reqBody: RunCodeRequest = { language, code };
 
-  const res = await api('code', {
+  const res = await codeApi('code', {
     method: 'POST',
     body: JSON.stringify(reqBody),
     headers: {
@@ -65,8 +69,7 @@ export const endSession = async (roomId: string, token: string) => {
     },
   });
 
-  const data: unknown = await res.json();
   if (!res.ok) {
-    throw Error((data as BaseResponse).message);
+    throw Error('Something went wrong with ending session');
   }
 };

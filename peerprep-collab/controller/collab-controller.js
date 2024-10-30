@@ -15,17 +15,11 @@ const userInRoom = (user, room) => {
   return true;
 };
 
+let roomIdToSocket = {};
+
 export const onConnection = (ws, req, user) => {
   const docName = req.url.slice(1); // Use the URL as the document name
-  // Verify and check if the room has been created in DB
-  // If room not created yet, reject this connection
   const room = {};
-  if (!room) {
-    console.log("Invalid room");
-    ws.emit("close");
-    return;
-  }
-
   // If created, check if the current user is supposed to be in this room
   if (!userInRoom(user.id, room)) {
     console.log("User not ssupposed to be in room");
@@ -33,6 +27,10 @@ export const onConnection = (ws, req, user) => {
     return;
   }
   setupWSConnection(ws, req, { docName });
+  roomIdToSocket = {
+    ...roomIdToSocket,
+    [docName]: [...(roomIdToSocket[docName] ?? []), ws],
+  };
 
   console.log(`User ${user.id} connected to document: ${docName}`);
 
@@ -155,40 +153,44 @@ export const endSession = async (roomId) => {
       return { message: "Room not found", success: false };
     }
 
-    console.log(result)
+    console.log(result);
     const { match_id1, match_id2 } = result;
 
     // Call the matching service's cancel API for each match_id
     try {
-
-    
-    await Promise.all([
-      axios.post(
-        `${matching_url}/match/cancel`,
-        { id: match_id1 },
-        {
-          headers: {
-            "X-Microservice-Secret": process.env.MICROSERVICE_SECRET,
-          },
-        }
-      ),
-      axios.post(
-        `${matching_url}/match/cancel`,
-        { id: match_id2 },
-        {
-          headers: {
-            "X-Microservice-Secret": process.env.MICROSERVICE_SECRET,
-          },
-        }
-      ),
-    ]);
-  } catch (e) {
-    console.log(e);
-  }
-
+      await Promise.all([
+        axios.post(
+          `${matching_url}/match/cancel`,
+          { id: match_id1 },
+          {
+            headers: {
+              "X-Microservice-Secret": process.env.MICROSERVICE_SECRET,
+            },
+          }
+        ),
+        axios.post(
+          `${matching_url}/match/cancel`,
+          { id: match_id2 },
+          {
+            headers: {
+              "X-Microservice-Secret": process.env.MICROSERVICE_SECRET,
+            },
+          }
+        ),
+      ]);
+    } catch (e) {
+      console.log(e);
+    }
     console.log(
       `Room with id ${roomId} updated to "completed" and matches canceled`
     );
+
+    // Close websocket yjs connection
+    const sockets = roomIdToSocket[roomId];
+    sockets.forEach((socket) => {
+      console.log("Closing socket for ", roomId);
+      socket.close();
+    });
   } catch (error) {
     console.error("Error ending session and canceling matches:", error);
   }
@@ -201,7 +203,7 @@ export const getRoomDetails = async (roomId) => {
 
     const room = await roomsCollection.findOne({ _id: new ObjectId(roomId) });
 
-    if ( room.status == "active" ) {
+    if (room.status == "active") {
       return {
         question_id: room.question_id,
         user_id1: room.user_id1,
