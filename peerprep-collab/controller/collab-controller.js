@@ -150,18 +150,22 @@ export const endSession = async (roomId) => {
       { returnDocument: "after" }
     );
 
-    if (!result.value) {
-      console.log(`No room found with id: ${roomId}`);
+    if (result.ok == 0) {
+      console.log(`No room found with id: ${roomId}`, result);
       return { message: "Room not found", success: false };
     }
 
-    const { match_id1, match_id2 } = result.value;
+    console.log(result)
+    const { match_id1, match_id2 } = result;
 
     // Call the matching service's cancel API for each match_id
+    try {
+
+    
     await Promise.all([
       axios.post(
-        `${matching_url}/cancel`,
-        { match_id: match_id1 },
+        `${matching_url}/match/cancel`,
+        { id: match_id1 },
         {
           headers: {
             "X-Microservice-Secret": process.env.MICROSERVICE_SECRET,
@@ -169,8 +173,8 @@ export const endSession = async (roomId) => {
         }
       ),
       axios.post(
-        `${matching_url}/cancel`,
-        { match_id: match_id2 },
+        `${matching_url}/match/cancel`,
+        { id: match_id2 },
         {
           headers: {
             "X-Microservice-Secret": process.env.MICROSERVICE_SECRET,
@@ -178,6 +182,9 @@ export const endSession = async (roomId) => {
         }
       ),
     ]);
+  } catch (e) {
+    console.log(e);
+  }
 
     console.log(
       `Room with id ${roomId} updated to "completed" and matches canceled`
@@ -194,7 +201,7 @@ export const getRoomDetails = async (roomId) => {
 
     const room = await roomsCollection.findOne({ _id: new ObjectId(roomId) });
 
-    if (room) {
+    if ( room.status == "active" ) {
       return {
         question_id: room.question_id,
         user_id1: room.user_id1,
