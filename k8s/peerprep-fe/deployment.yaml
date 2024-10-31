@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peerprep-fe
+spec:
+  selector:
+    matchLabels:
+      app: peerprep-fe
+  template:
+    metadata:
+      labels:
+        app: peerprep-fe
+    spec:
+      containers:
+      - name: peerprep-fe
+        image: gcr.io/peerprep-g32/peerprep-fe@sha256:808b730e5b6e20134a38551997509a9ffe705a8b63ad2db0efadc9dd5ca1cddc
+        ports:
+        - containerPort: 3000
+# TODO: secrets instead of .env files?
