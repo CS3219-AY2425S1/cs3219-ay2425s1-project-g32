@@ -18,3 +18,5 @@ spec:
       containers:
       - name: peerprep-code
         image: gcr.io/peerprep-g32/peerprep-code@sha256:0dadf03363fa924c927810dedd42f80302088c5f9cef19ce31d08c7641d1917e
+        securityContext:
+          privileged: true
