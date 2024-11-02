@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peerprep-match-api
+  namespace: default
+  labels:
+    app: peerprep-match-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: peerprep-match-api
+  template:
+    metadata:
+      labels:
+        app: peerprep-match-api
+    spec:
+      containers:
+      - name: peerprep-match-api
+        image: gcr.io/peerprep-g32/peerprep-match-api@sha256:46e1f9331027ed124430f4741ed5890722af11598c35f476dbea5da210cfec4d

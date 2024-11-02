@@ -13,4 +13,4 @@ RUN apk --no-cache add wget \
 COPY . .
 
 # Command to wait for RabbitMQ and run the Go app
-CMD ["dockerize", "-wait", "tcp://rabbitmq:5672/", "-timeout", "30s", "go", "run", "worker/main.go"]
+CMD ["dockerize", "-wait", "tcp://rabbitmq-service.default:5672/", "-timeout", "30s", "go", "run", "worker/main.go"]

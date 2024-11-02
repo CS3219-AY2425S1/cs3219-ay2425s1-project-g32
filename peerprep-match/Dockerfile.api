@@ -13,7 +13,7 @@ RUN apk --no-cache add wget \
 COPY . .
 
 # Command to wait for RabbitMQ and run the Go app
-CMD ["dockerize", "-wait", "tcp://rabbitmq:5672/", "-timeout", "30s", "go", "run", "api/main.go"]
+CMD ["dockerize", "-wait", "tcp://rabbitmq-service.default:5672/", "-timeout", "30s", "go", "run", "api/main.go"]
 
 # Expose the port 3000 to the outside world
 EXPOSE 3003

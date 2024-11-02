@@ -21,8 +21,7 @@ COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
 
 # Expose the necessary ports
-EXPOSE 1234
-EXPOSE 9000
+EXPOSE 4321
 
 # Use the entrypoint script as the start command for the container
 CMD ["/app/docker-entrypoint.sh"]
