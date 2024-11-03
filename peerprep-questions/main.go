@@ -20,7 +20,7 @@ func main() {
 
 	r := chi.NewRouter()
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"}, // Replace with your frontend URL
+		AllowedOrigins:   []string{"http://peerprep-g32.34.126.92.100.nip.io"}, // Replace with your frontend URL
 		AllowCredentials: true,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
 		AllowedHeaders:   []string{"*"},

@@ -17,4 +17,4 @@ spec:
     spec:
       containers:
       - name: peerprep-match-api
-        image: gcr.io/peerprep-g32/peerprep-match-api@sha256:46e1f9331027ed124430f4741ed5890722af11598c35f476dbea5da210cfec4d
+        image: gcr.io/peerprep-g32/peerprep-match-api@sha256:3debe73cc4ad17b1f492e51992804f0aa90e91ed26960caeed3623b49a58327c
