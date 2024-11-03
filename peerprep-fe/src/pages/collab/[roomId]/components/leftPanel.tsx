@@ -50,7 +50,7 @@ const LeftPanel = () => {
       router.push('/');
       toast({ description: 'Session ended, goodbye' });
     } catch {
-      toast({ variant: 'destructive', description: 'Something wentw rong in the server' });
+      toast({ variant: 'destructive', description: 'Something went wrong in the server' });
     }
   };
 
@@ -61,7 +61,7 @@ const LeftPanel = () => {
           <Link href="/">
             <div className="text-lg font-bold">Peerprep</div>
           </Link>
-          <Label className="mt-1">[Session with Paul]</Label>
+          <Label className="mt-1">[Session with {sessionData?.user.username}]</Label>
         </SidebarHeader>
         <Separator />
         <SidebarContent>
