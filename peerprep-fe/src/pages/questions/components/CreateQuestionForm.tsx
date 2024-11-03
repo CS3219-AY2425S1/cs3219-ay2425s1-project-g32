@@ -27,6 +27,9 @@ const initialValues: Omit<Question, 'id'> = {
   description: '',
   category: [],
   complexity: 'Medium',
+  explaination: '',
+  sample_input: '',
+  sample_output: '',
 };
 
 const availableCategories = [
