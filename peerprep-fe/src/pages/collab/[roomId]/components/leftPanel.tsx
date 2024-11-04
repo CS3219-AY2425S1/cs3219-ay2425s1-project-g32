@@ -30,6 +30,8 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/toast/use-toast';
 import { useSession } from '@/context/useSession';
 
+import { useRoom } from '../useRoom';
+
 import Chat from './chat';
 import Question from './question';
 
@@ -41,6 +43,7 @@ const LeftPanel = () => {
   const { setTheme } = useTheme();
   const { sessionData } = useSession();
   const { toast } = useToast();
+  const { otherUser } = useRoom();
 
   const onEndSession = async () => {
     // TODO: Need to call end
@@ -61,7 +64,7 @@ const LeftPanel = () => {
           <Link href="/">
             <div className="text-lg font-bold">Peerprep</div>
           </Link>
-          <Label className="mt-1">[Session with {sessionData?.user.username}]</Label>
+          <Label className="mt-1">[Session with {otherUser?.username || '-'}]</Label>
         </SidebarHeader>
         <Separator />
         <SidebarContent>

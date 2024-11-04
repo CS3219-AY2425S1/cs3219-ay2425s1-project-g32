@@ -59,6 +59,23 @@ export const getRoom = async (roomId: string, token: string) => {
   return data as Room;
 };
 
+export const getRoomForUser = async (userId: string, token: string) => {
+  const res = await api(`collab/get-active-room/${userId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data: unknown = await res.json();
+  if (!res.ok) {
+    throw Error((data as BaseResponse).message);
+  }
+
+  return (data as { room_id: string }).room_id;
+};
+
 export const endSession = async (roomId: string, token: string) => {
   const res = await api(`collab/end-session`, {
     method: 'POST',

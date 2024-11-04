@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { getRoomForUser } from '@/api/code';
 import { cancelMatch, performMatching, pollMatchingStatus, PollStatus } from '@/api/matching';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import BlockSpinning from '@/components/ui/loading/blockSpinning';
+import Loading from '@/components/ui/loading/loading';
 import {
   Select,
   SelectContent,
@@ -69,6 +71,7 @@ const FindMatchPage = () => {
   const [displayHint, setDisplayHint] = useState(false);
   const { toast } = useToast();
   const [cancelDisabled, setCancelDisabled] = useState(true);
+  const [ready, setReady] = useState(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -78,6 +81,18 @@ const FindMatchPage = () => {
       topic: '',
     },
   });
+
+  useEffect(() => {
+    if (!sessionData) return;
+    (async () => {
+      const id = await getRoomForUser(sessionData.user.id, sessionData.accessToken);
+      if (id) {
+        router.push(`/collab/${id}`);
+        return;
+      }
+      setReady(true);
+    })();
+  }, [sessionData, router]);
 
   const onSubmit = async () => {
     if (!sessionData) {
@@ -184,6 +199,14 @@ const FindMatchPage = () => {
       return () => clearInterval(pollIntervalId.current as ReturnType<typeof setInterval>);
     }
   }, [matchRequestId, pollStatus]);
+
+  if (!ready) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <>
