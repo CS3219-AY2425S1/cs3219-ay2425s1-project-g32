@@ -5,23 +5,23 @@ services:
         ports:
             - "3000:3000"
         depends_on:
-            - peerprep-users
-            - peerprep-questions
+            - peerprep-users-service
+            - peerprep-questions-service
 
-    peerprep-questions:
+    peerprep-questions-service:
         build: ./peerprep-questions # Path to your peerprep-questions Dockerfile
         ports:
             - "3001:3001"
         depends_on:
-            - peerprep-users
+            - peerprep-users-service
 
-    peerprep-users:
+    peerprep-users-service:
         build: ./peerprep-users # Path to your peerprep-users Dockerfile
         ports:
             - "3002:3002"
 
     # for configuring a local rabbitmq instance
-    rabbitmq:
+    rabbitmq-service:
         image: rabbitmq:3.13-management
         ports:
             - "15672:15672"
@@ -32,7 +32,7 @@ services:
             timeout: 5s
             retries: 5
 
-    peerprep-match-api:
+    peerprep-match-api-service:
         build:
             context: ./peerprep-match
             dockerfile: ./Dockerfile.api
@@ -41,8 +41,8 @@ services:
         env_file:
             - ./peerprep-match/.env
         depends_on:
-            - peerprep-users
-            - rabbitmq
+            rabbitmq-service:
+                condition: service_healthy
 
     peerprep-match-worker:
         build:
@@ -51,10 +51,10 @@ services:
         env_file:
             - ./peerprep-match/.env
         depends_on:
-            - peerprep-users
-            - rabbitmq
+            rabbitmq-service:
+                condition: service_healthy
 
-    peerprep-collab:
+    peerprep-collab-service:
         build:
             context: ./peerprep-collab
             dockerfile: ./Dockerfile
@@ -62,15 +62,15 @@ services:
             - "1234:1234"
             - "9000:9000"
         depends_on:
-            rabbitmq:
+            rabbitmq-service:
                 condition: service_healthy
 
-    peerprep-code:
+    peerprep-code-service:
         build:
             context: ./peerprep-code
             dockerfile: ./Dockerfile
         ports:
             - "4321:4321"
         depends_on:
-            - peerprep-users
+            - peerprep-users-service
         privileged: true

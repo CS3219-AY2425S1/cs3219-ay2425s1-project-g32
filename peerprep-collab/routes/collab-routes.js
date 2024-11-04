@@ -1,6 +1,6 @@
 import express from "express";
 
-import { endSession, getRoomDetails } from "../controller/collab-controller.js";
+import { endSession, getRoomDetails, getActiveRoom } from "../controller/collab-controller.js";
 
 const router = express.Router();
 
@@ -38,6 +38,23 @@ router.get("/room-details/:roomId", async (req, res) => {
   } catch (error) {
     console.error("Error in room-details route:", error);
     res.status(500).json({ message: "Failed to retrieve room details" });
+  }
+});
+
+router.get("/get-active-room/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  if (!userId) {
+    return res.status(400).json({ message: "roomId is required" });
+  }
+
+  try {
+    const id = await getActiveRoom(userId);
+
+    res.status(200).json({ room_id: id });
+  } catch (error) {
+    console.error("Error get active room", error);
+    res.status(500).json({ message: "Error fetching active room"})
   }
 });
 

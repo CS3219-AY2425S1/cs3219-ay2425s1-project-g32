@@ -216,3 +216,23 @@ export const getRoomDetails = async (roomId) => {
     console.error("Error fetching room details:", error);
   }
 };
+
+export const getActiveRoom = async (userId) => {
+  try {
+    const db = await connectDB();
+    const roomsCollection = db.collection("rooms");
+
+    const room = await roomsCollection.findOne({ 
+      status: "active",
+      $or: [
+        { user_id1: userId },
+        { user_id2: userId }
+      ]
+    });
+    
+    return room ? room._id.toString() : "";
+    
+  } catch (error) {
+    console.error("Error fetching room details:", error);
+  }
+};
