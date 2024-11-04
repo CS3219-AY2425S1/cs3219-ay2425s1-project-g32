@@ -4,8 +4,13 @@ metadata:
   name: peerprep-fe-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: nginx
+  tls:
+  - hosts:
+    - peerprep-g32.34.126.92.100.nip.io
+    secretName: peerprep-fe-tls
   rules:
   - host: peerprep-g32.34.126.92.100.nip.io
     http:
@@ -28,9 +33,14 @@ metadata:
       nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
       nginx.ingress.kubernetes.io/enable-websocket: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
   #   nginx.ingress.kubernetes.io/rewrite-target: /$1
 spec:
   ingressClassName: nginx
+  tls:
+  - hosts:
+    - backend.34.126.92.100.nip.io
+    secretName: peerprep-api-tls
   rules:
   - host: backend.34.126.92.100.nip.io
     http:

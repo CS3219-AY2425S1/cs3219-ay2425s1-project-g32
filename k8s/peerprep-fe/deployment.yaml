@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: peerprep-fe
-        image: gcr.io/peerprep-g32/peerprep-fe@sha256:b54a58f894cf16bda6d39100f3592904d522f98c05ee9578ff5d60c72c8086e0
+        image: gcr.io/peerprep-g32/peerprep-fe@sha256:81730cc9b3761d891e9092e0fa5e07730a9270e23b2135c3c3e98c5a8419e8f9
         ports:
         - containerPort: 3000
 # TODO: secrets instead of .env files?

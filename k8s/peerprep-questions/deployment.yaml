@@ -17,4 +17,4 @@ spec:
     spec:
       containers:
       - name: peerprep-questions
-        image: gcr.io/peerprep-g32/peerprep-questions@sha256:d064525b714180cc5bdd732392540177dbf591ed1704ba72636d13397b8956df
+        image: gcr.io/peerprep-g32/peerprep-questions@sha256:6d6d03dabd7a68c46965a3d0ee98b2d6cf6e1d2978ffac115eddd9d3bd292046

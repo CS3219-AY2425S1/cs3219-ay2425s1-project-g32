@@ -122,6 +122,7 @@ const Chat = () => {
         });
       });
     } catch (e) {
+      console.error('Error accessing camera/mic:', e);
       toast({ variant: 'destructive', description: 'unable to turn on your camera/mic' });
       return;
     }
@@ -146,9 +147,10 @@ const Chat = () => {
       let peerInstance: Peer;
       if (typeof window !== 'undefined') {
         peerInstance = new Peer(sessionData.user.id, {
-          host: 'localhost',
-          port: 9000,
+          host: 'backend.34.126.92.100.nip.io',
           path: '/signaling',
+          port: 443,
+          secure: true,
         });
 
         setPeer(peerInstance);

@@ -7,10 +7,10 @@ metadata:
     app: peerprep-collab
 spec:
   ports:
-  - name: 1234-to-1234-tcp
+  - name: 4321-to-4321-tcp
     protocol: TCP
-    port: 1234
-    targetPort: 1234
+    port: 4321
+    targetPort: 4321
   - name: 9000-to-9000-tcp
     protocol: TCP
     port: 9000
