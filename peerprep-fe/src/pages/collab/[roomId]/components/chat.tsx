@@ -181,7 +181,7 @@ const Chat = () => {
               {!ready && <TooltipContent>You need to enable camera and mic first</TooltipContent>}
             </Tooltip>
           </TooltipProvider>
-          <Button
+          {/* <Button
             disabled={!call}
             size="sm"
             variant="outline"
@@ -189,7 +189,7 @@ const Chat = () => {
             className="bg-red-500 text-white"
           >
             <PhoneOff className="h-4 w-4" />
-          </Button>
+          </Button> */}
         </div>
       </div>
       <div className="flex flex-col gap-y-5">
