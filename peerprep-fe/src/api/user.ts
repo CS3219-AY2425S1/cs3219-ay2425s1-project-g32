@@ -94,13 +94,13 @@ export const getUser = async (id: string, token: string) => {
   return data as GetUserResponse;
 };
 
-interface UpdateUserResponse extends BaseResponse {
+interface ChangePasswordResponse extends BaseResponse {
   data: User;
 }
 
-export const updateUser = async (id: string, password: string, token: string) => {
-  const res = await api(`users/${id}`, {
-    method: 'PUT',
+export const changePassword = async (id: string, password: string, token: string) => {
+  const res = await api(`users/${id}/password`, {
+    method: 'PATCH',
     body: JSON.stringify({
       password,
     }),
@@ -114,5 +114,5 @@ export const updateUser = async (id: string, password: string, token: string) =>
   if (!res.ok) {
     throw Error((data as BaseResponse).message);
   }
-  return data as UpdateUserResponse;
+  return data as ChangePasswordResponse;
 };

@@ -5,7 +5,7 @@ import { useSession } from '@/context/useSession';
 import { Button } from '@/components/ui/button';
 import Input from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getUser, updateUser } from '@/api/user';
+import { getUser, changePassword } from '@/api/user';
 import { User } from '@/types/user';
 
 const ProfilePage = () => {
@@ -48,7 +48,7 @@ const ProfilePage = () => {
       const user = await getUser(sessionData.user.id, sessionData.accessToken);
       setUser(user.data);
 
-      await updateUser(user.data.id, newPassword, sessionData.accessToken);
+      await changePassword(user.data.id, newPassword, sessionData.accessToken);
       
       setSuccess('Password changed successfully');
       setNewPassword('');

@@ -7,6 +7,7 @@ import {
   getUser,
   updateUser,
   updateUserPrivilege,
+  changePassword,
 } from "../controller/user-controller.js";
 import {
   verifyAccessToken,
@@ -32,5 +33,12 @@ router.get("/:id", verifyAccessToken, getUser);
 router.patch("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, updateUser);
 
 router.delete("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, deleteUser);
+
+router.patch(
+  "/:id/password",
+  verifyAccessToken,
+  verifyIsOwnerOrAdmin,
+  changePassword
+);
 
 export default router;

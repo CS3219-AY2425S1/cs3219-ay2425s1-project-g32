@@ -156,6 +156,38 @@ export async function deleteUser(req, res) {
   }
 }
 
+export async function changePassword(req, res) {
+  try {
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+
+    const userId = req.params.id;
+    if (!isValidObjectId(userId)) {
+      return res.status(404).json({ message: `User ${userId} not found` });
+    }
+
+    const user = await _findUserById(userId);
+    if (!user) {
+      return res.status(404).json({ message: `User ${userId} not found` });
+    }
+
+    // Hash and update new password
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(password, salt);
+    const updatedUser = await _updateUserById(userId, undefined, undefined, hashedPassword);
+
+    return res.status(200).json({
+      message: `Updated password for user ${userId}`,
+      data: formatUserResponse(updatedUser),
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Unknown error when changing password!" });
+  }
+}
+
 export function formatUserResponse(user) {
   return {
     id: user.id,
