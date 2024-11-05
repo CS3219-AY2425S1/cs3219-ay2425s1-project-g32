@@ -39,6 +39,13 @@ const Header = () => {
               Find Match
             </Button>
           </Link>
+          {sessionData && (
+            <Link href="/profile">
+              <Button className="font-semibold" variant="ghost">
+                View Profile
+              </Button>
+            </Link>
+          )}
           <div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

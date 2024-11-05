@@ -93,3 +93,26 @@ export const getUser = async (id: string, token: string) => {
   }
   return data as GetUserResponse;
 };
+
+interface UpdateUserResponse extends BaseResponse {
+  data: User;
+}
+
+export const updateUser = async (id: string, password: string, token: string) => {
+  const res = await api(`users/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      password,
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data: unknown = await res.json();
+  if (!res.ok) {
+    throw Error((data as BaseResponse).message);
+  }
+  return data as UpdateUserResponse;
+};
