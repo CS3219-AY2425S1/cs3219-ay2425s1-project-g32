@@ -123,14 +123,18 @@ export const consumeMessages = async (rmq_uri, rmq_queue_name) => {
 
     console.log(`Waiting for messages in ${rmq_queue_name}`);
 
-    channel.consume(rmq_queue_name, (message) => {
-      if (message !== null) {
-        const roomInfo = JSON.parse(message.content.toString());
-        console.log("Received room creation message: ", roomInfo);
+    channel.consume(
+      rmq_queue_name,
+      (message) => {
+        if (message !== null) {
+          const roomInfo = JSON.parse(message.content.toString());
+          console.log("Received room creation message: ", roomInfo);
 
-        createSession(roomInfo);
-      }
-    });
+          createSession(roomInfo);
+        }
+      },
+      { noAck: true }  // Enable auto-acknowledgement
+    );
   } catch (error) {
     console.error("Failed to connect to RabbitMQ:", error);
   }

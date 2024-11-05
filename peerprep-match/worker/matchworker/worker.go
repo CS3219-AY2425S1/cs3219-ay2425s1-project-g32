@@ -143,11 +143,23 @@ func (w *Worker) HandleMessage(req model.MatchRequestMessage) error {
 		complexity = match.Complexity
 	} else {
 		complexity = ""
+		if match.Complexity == "All" && otherMatch.Complexity != "All" {
+			complexity = otherMatch.Complexity
+		}
+		if match.Complexity != "All" && otherMatch.Complexity == "All" {
+			complexity = match.Complexity
+		}
 	}
 	if match.Category == otherMatch.Category {
 		category = match.Category
 	} else {
 		category = ""
+		if match.Category == "All" && otherMatch.Category != "All" {
+			category = otherMatch.Category
+		}
+		if match.Category != "All" && otherMatch.Category == "All" {
+			category = match.Category
+		}
 	}
 
 	collab_message := model.CollabMessage{
