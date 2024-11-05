@@ -94,9 +94,6 @@ const Chat = () => {
       call.on('close', () => {
         setOtherVideoState(VideoState.UNAVAILABLE);
       });
-    } else {
-      toast({ variant: 'destructive', description: 'Somethign went wrong with the server' });
-      setOtherVideoState(VideoState.UNAVAILABLE);
     }
     setCall(call);
   };
