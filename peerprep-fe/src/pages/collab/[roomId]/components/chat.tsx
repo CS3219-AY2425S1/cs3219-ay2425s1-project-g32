@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { Phone, PhoneOff, VideoOff } from 'lucide-react';
-import Peer, { type MediaConnection } from 'peerjs';
+import { Phone, VideoOff } from 'lucide-react';
+import Peer from 'peerjs';
 
 import { Button } from '@/components/ui/button';
 import Loading from '@/components/ui/loading/loading';
@@ -67,7 +67,7 @@ const Chat = () => {
   const [myVideoState, setMyVideoState] = useState(VideoState.UNAVAILABLE);
   const [otherVideoState, setOtherVideoState] = useState(VideoState.UNAVAILABLE);
   const [peer, setPeer] = useState<Peer | null>(null);
-  const [call, setCall] = useState<MediaConnection>();
+  // const [call, setCall] = useState<MediaConnection>();
   const { sessionData } = useSession();
   const { otherUser } = useRoom();
   const { toast } = useToast();
@@ -95,7 +95,7 @@ const Chat = () => {
         setOtherVideoState(VideoState.UNAVAILABLE);
       });
     }
-    setCall(call);
+    // setCall(call);
   };
 
   const onReady = async () => {
@@ -126,16 +126,16 @@ const Chat = () => {
     setReady(true);
   };
 
-  const onEndCall = () => {
-    if (!call || !peer) return;
-    call.off('stream');
-    peer.off('call');
-    peer.emit('close');
-    call.emit('close');
-    call.close();
-    setCall(undefined);
-    setOtherVideoState(VideoState.UNAVAILABLE);
-  };
+  // const onEndCall = () => {
+  //   if (!call || !peer) return;
+  //   call.off('stream');
+  //   peer.off('call');
+  //   peer.emit('close');
+  //   call.emit('close');
+  //   call.close();
+  //   setCall(undefined);
+  //   setOtherVideoState(VideoState.UNAVAILABLE);
+  // };
 
   // Connect to chat
   // eslint-disable-next-line consistent-return
