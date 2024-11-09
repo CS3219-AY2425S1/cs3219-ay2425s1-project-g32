@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from '@/context/useSession';
-import { Button } from '@/components/ui/button';
-import Input from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { getUser, changePassword } from '@/api/user';
-import { User } from '@/types/user';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Input from '@/components/ui/input';
+import { useSession } from '@/context/useSession';
+import { Role, type User } from '@/types/user';
 
 const ProfilePage = () => {
   const { sessionData } = useSession();
@@ -49,7 +50,7 @@ const ProfilePage = () => {
       setUser(user.data);
 
       await changePassword(user.data.id, newPassword, sessionData.accessToken);
-      
+
       setSuccess('Password changed successfully');
       setNewPassword('');
       setConfirmPassword('');
@@ -60,18 +61,18 @@ const ProfilePage = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <Card className="max-w-md mx-auto">
+      <Card className="mx-auto max-w-md">
         <CardHeader>
           <CardTitle>Profile</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="mb-6">
-            <h2 className="text-lg font-semibold mb-2">Username</h2>
+            <h2 className="mb-2 text-lg font-semibold">Username</h2>
             <p className="text-gray-600 dark:text-gray-300">{user?.username}</p>
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold mb-4">Change Password</h2>
+            <h2 className="mb-4 text-lg font-semibold">Change Password</h2>
             <form onSubmit={handlePasswordChange}>
               <div className="space-y-4">
                 <div>
@@ -90,8 +91,8 @@ const ProfilePage = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                 </div>
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-                {success && <p className="text-green-500 text-sm">{success}</p>}
+                {error && <p className="text-sm text-red-500">{error}</p>}
+                {success && <p className="text-sm text-green-500">{success}</p>}
                 <Button type="submit">Change Password</Button>
               </div>
             </form>
@@ -100,6 +101,10 @@ const ProfilePage = () => {
       </Card>
     </div>
   );
+};
+
+ProfilePage.authenticationEnabled = {
+  role: Role.USER,
 };
 
 export default ProfilePage;

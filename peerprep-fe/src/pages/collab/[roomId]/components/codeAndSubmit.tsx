@@ -60,14 +60,18 @@ const CodeAndSubmit = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <InfoIcon className="h-4 w-4 text-gray-400" />
-                    </TooltipTrigger>
-                    <TooltipContent>Language does not support execution currently.</TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                {!executable && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <InfoIcon className="h-4 w-4 text-gray-400" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Language does not support execution currently.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
               </div>
               <Select value={theme} onValueChange={(v) => setTheme(v)}>
                 <SelectTrigger className="w-40">

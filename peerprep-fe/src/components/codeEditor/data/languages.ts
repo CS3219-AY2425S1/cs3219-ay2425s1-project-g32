@@ -7,13 +7,11 @@ export const LANGUAGES: Record<string, string> = {
   CSS: 'CSS',
   MARKDOWN: 'Markdown',
   JAVASCRIPT: 'Javascript',
-  // TYPESCRIPT: 'Typescript',
   GO: 'Go',
 };
 
 export const EXECUTABLE_LANGUAGES: Record<string, string> = {
   CPP: 'C++',
-  C: 'C',
   PYTHON: 'Python',
   RUST: 'Rust',
   JAVASCRIPT: 'Javascript',

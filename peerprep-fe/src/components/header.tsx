@@ -1,8 +1,12 @@
+import { useEffect, useState } from 'react';
+
 import { deleteCookie } from 'cookies-next';
 import { Sun, Moon, Laptop2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useTheme } from 'next-themes';
 
+import { getRoomForUser } from '@/api/code';
 import { useSession } from '@/context/useSession';
 
 import { Button } from './ui/button';
@@ -14,13 +18,23 @@ import {
 } from './ui/dropdownMenu';
 
 const Header = () => {
+  const router = useRouter();
   const { setTheme } = useTheme();
+  const [hasRoom, setHasRoom] = useState(false);
   const { sessionData } = useSession();
   const onLogout = () => {
     // signout
     deleteCookie('auth');
     window.location.reload();
   };
+
+  useEffect(() => {
+    if (!sessionData) return;
+    (async () => {
+      const id = await getRoomForUser(sessionData.user.id, sessionData.accessToken);
+      setHasRoom(id !== '');
+    })();
+  }, [sessionData, router]);
 
   return (
     <header className="shadow">
@@ -36,7 +50,7 @@ const Header = () => {
           </Link>
           <Link href="/find-match">
             <Button className="font-semibold" variant="ghost">
-              Find Match
+              {hasRoom ? 'Resume match' : 'Find Match'}
             </Button>
           </Link>
           {sessionData && (
