@@ -41,24 +41,6 @@ type RoomContextType = {
 
 const RoomContext = createContext<RoomContextType>({} as RoomContextType);
 
-interface State {
-  user: {
-    name: string;
-  };
-}
-
-const getOtherUser = (state: Map<number, State>, currentUser: string) => {
-  const y = Array.from(state.entries());
-  // eslint-disable-next-line no-restricted-syntax
-  for (const val of y) {
-    const value = val[1];
-    if (value.user && value.user.name && value.user.name !== currentUser) {
-      return value.user.name;
-    }
-  }
-  return '';
-};
-
 const usercolors = [
   { color: '#30bced', light: '#30bced33' },
   { color: '#6eeb83', light: '#6eeb8333' },
@@ -106,12 +88,17 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
       try {
         const room = await getRoom(roomId as string, sessionData.accessToken);
         setRoom(room);
+        if (room.user_id1 === sessionData.user.id) {
+          handle(room.user_id2, sessionData.accessToken);
+        } else {
+          handle(room.user_id1, sessionData.accessToken);
+        }
       } catch {
         toast({ variant: 'destructive', description: 'Something went wrong' });
         router.push('/');
       }
     })();
-  }, [roomId, router, sessionData, toast]);
+  }, [roomId, handle, router, sessionData, toast]);
 
   useEffect(() => {
     if (!sessionData || !roomId) return;
@@ -124,25 +111,12 @@ export const RoomProvider: FC<PropsWithChildren> = ({ children }) => {
         protocols: [sessionData.accessToken],
       }
     );
-    const handleChange = () => {
-      handle(
-        getOtherUser(wsProvider.awareness.getStates() as Map<number, State>, sessionData.user.id),
-        sessionData.accessToken
-      );
-    };
 
     wsProvider.awareness.setLocalStateField('user', {
-      name: sessionData?.user.id || 'Anonymouss',
+      name: sessionData?.user.username || 'Anonymouss',
       color: userColor.color,
       colorLight: userColor.light,
     });
-
-    handle(
-      getOtherUser(wsProvider.awareness.getStates() as Map<number, State>, sessionData.user.id),
-      sessionData.accessToken
-    );
-
-    wsProvider.awareness.on('change', handleChange);
 
     if (wsProvider.ws) {
       wsProvider.ws.onclose = () => {
