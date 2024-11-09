@@ -17,4 +17,4 @@ spec:
     spec:
       containers:
       - name: peerprep-match-worker
-        image: gcr.io/peerprep-g32/peerprep-match-worker@sha256:51fba1d7dba2bdaf2a1256180313a77c84a261ca4c1a81d7ab0f7c0edaa5ca7b
+        image: gcr.io/peerprep-g32/peerprep-match-worker@sha256:aa605d37615f9ba74244f541be263d147bc6bd79d599121769c9dbd00b46a9b0

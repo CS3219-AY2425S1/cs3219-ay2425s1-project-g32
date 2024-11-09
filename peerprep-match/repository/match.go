@@ -34,11 +34,15 @@ func GetFilter(filter model.GetMatchFilter) (bson.M, error) {
 	}
 
 	if filter.Category != "" && filter.Category != "All" {
-		f["category"] = filter.Category
+		f["category"] = bson.M{
+			"$in": []string{filter.Category, "All"},
+		}
 	}
 
 	if filter.Complexity != "" && filter.Complexity != "All" {
-		f["complexity"] = filter.Complexity
+		f["complexity"] = bson.M{
+			"$in": []string{filter.Complexity, "All"},
+		}
 	}
 
 	return f, nil
