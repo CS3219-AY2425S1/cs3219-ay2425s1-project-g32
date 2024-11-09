@@ -52,9 +52,7 @@ const TOPICS = [
   'Arrays',
   'Bit Manipulation',
   'Algorithms',
-  'Brainteaser',
   'Data Structures',
-  'Databases',
 ];
 
 const POLL_INTERVAL = 3000; // Poll every 5 seconds

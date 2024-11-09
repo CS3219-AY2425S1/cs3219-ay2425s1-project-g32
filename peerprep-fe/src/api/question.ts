@@ -10,6 +10,9 @@ export interface BaseResponse {
 
 export const getQuestions = async (complexity: string, category: string) => {
   const queryParams = [];
+  queryParams.push('sample_input=defaultValue');
+  queryParams.push('sample_output=defaultValue');
+
   if (complexity) {
     queryParams.push(`complexity=${complexity}`);
   }
