@@ -1,0 +1,19 @@
+FROM golang:1.23-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Install Dockerize to wait for dependencies
+RUN apk --no-cache add wget \
+  && wget https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz \
+  && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.6.1.tar.gz \
+  && rm dockerize-linux-amd64-v0.6.1.tar.gz
+
+# Copy the Go application code into the container
+COPY . .
+
+# Command to wait for RabbitMQ and run the Go app
+CMD ["dockerize", "go", "run", "api/main.go"]
+
+# Expose the port 3000 to the outside world
+EXPOSE 3003

@@ -1,0 +1,104 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: peerprep-fe-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - peerprep-g32.34.126.92.100.nip.io
+    secretName: peerprep-fe-tls
+  rules:
+  - host: peerprep-g32.34.126.92.100.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: peerprep-fe
+            port:
+              number: 80
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: peerprep-api-ingress
+  annotations:
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+      nginx.ingress.kubernetes.io/enable-websocket: "true"
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  #   nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - backend.34.126.92.100.nip.io
+    secretName: peerprep-api-tls
+  rules:
+  - host: backend.34.126.92.100.nip.io
+    http:
+      paths:
+      - path: /question
+        pathType: Prefix
+        backend:
+          service:
+            name: peerprep-questions-service
+            port:
+              number: 3001
+      - path: /users
+        pathType: Prefix
+        backend:
+          service:
+            name: peerprep-users-service
+            port:
+              number: 3002
+      - path: /auth
+        pathType: Prefix
+        backend:
+          service:
+            name: peerprep-users-service
+            port:
+              number: 3002
+      - path: /match
+        pathType: Prefix
+        backend:
+          service:
+            name: peerprep-match-api-service
+            port:
+              number: 3003
+      - path: /collab
+        pathType: Prefix
+        backend:
+          service:
+            name: peerprep-collab-service
+            port:
+              number: 1234
+      # for websocket url
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: peerprep-collab-service
+            port:
+              number: 1234
+      - path: /signaling
+        pathType: Prefix
+        backend:
+          service:
+            name: peerprep-collab-service
+            port:
+              number: 9000
+      - path: /code
+        pathType: Prefix
+        backend:
+          service:
+            name: peerprep-code-service
+            port:  
+              number: 4321

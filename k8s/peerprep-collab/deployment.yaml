@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peerprep-collab
+  namespace: default
+  labels:
+    app: peerprep-collab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: peerprep-collab
+  template:
+    metadata:
+      labels:
+        app: peerprep-collab
+    spec:
+      containers:
+      - name: peerprep-collab
+        image: gcr.io/peerprep-g32/peerprep-collab@sha256:a87e53e5ae0fa4da49ee42c586615944e09702d658625ef7bf0890b0f0e8b267

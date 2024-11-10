@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peerprep-questions
+  namespace: default
+  labels:
+    app: peerprep-questions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: peerprep-questions
+  template:
+    metadata:
+      labels:
+        app: peerprep-questions
+    spec:
+      containers:
+      - name: peerprep-questions
+        image: gcr.io/peerprep-g32/peerprep-questions@sha256:6d6d03dabd7a68c46965a3d0ee98b2d6cf6e1d2978ffac115eddd9d3bd292046

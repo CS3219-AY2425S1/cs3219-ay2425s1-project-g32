@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peerprep-users
+  namespace: default
+  labels:
+    app: peerprep-users
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: peerprep-users
+  template:
+    metadata:
+      labels:
+        app: peerprep-users
+    spec:
+      containers:
+      - name: peerprep-users
+        image: gcr.io/peerprep-g32/peerprep-users@sha256:de274ad0f4be3460083b978052cd7d50c7f9b05a9d39b229c693c9909031a703
