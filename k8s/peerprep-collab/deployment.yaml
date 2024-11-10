@@ -17,4 +17,4 @@ spec:
     spec:
       containers:
       - name: peerprep-collab
-        image: gcr.io/peerprep-g32/peerprep-collab@sha256:061aab7857e70b97f071ffcc0a02ac37368666f706b73dc33a4f6b58db85467d
+        image: gcr.io/peerprep-g32/peerprep-collab@sha256:a87e53e5ae0fa4da49ee42c586615944e09702d658625ef7bf0890b0f0e8b267
